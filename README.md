@@ -1,4 +1,5 @@
 # MSA
+### Mathematical Statistics Assistant
 Team project of 4th year students of the Computer Science Department of the Higher School of Economics
 
 ## How to build and run project:
