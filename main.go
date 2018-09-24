@@ -2,6 +2,7 @@ package main
 
 import (
 	"MSA/handlers"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,6 +13,8 @@ func main() {
 
 	router.LoadHTMLGlob("templates/*")
 	router.GET("/", handlers.ShowMainPage)
+
+	fmt.Println("testing hooks")
 
 	router.Run()
 }
