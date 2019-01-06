@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MSA</title>
+</head>
+
+<body>
+<div class="form">
+    <h1>Главная страница MSA - Mathematical Statistics Assistant</h1>
+    <h3>Войдите под учетной записью преподавателя.<p>Email: <em>test@hse.ru</em><br>Пароль: <em>1234</em></h3>
+    {{ if .ErrorTitle}}
+        <p>
+    {{.ErrorTitle}}: {{.ErrorMessage}}
+        </p>
+    {{end}}
+    <form action="/auth/login" method = "POST">
+        <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+        </div>
+        <div>
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" placeholder="Пароль" required>
+        </div>
+        <button type="submit">Войти</button>
+    </form>
+</div>
+</body>
+</html>

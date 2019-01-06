@@ -1,0 +1,30 @@
+<!--signup.html-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Регистрация нового преподавателя</title>
+</head>
+<body>
+<div class="form">
+    <h2>Страница регистрации нового преподавателя</h2>
+    <h3>Введите имя, фамилию и email преподавателя.<br>Информация с логином и паролем придет на указанную почту.</h3>
+    <form class="form" action="/auth/register" method="POST">
+        <div>
+            <label for="name">Имя</label>
+            <input type="text" id="name" name="name" placeholder="Имя" required>
+        </div>
+        <div class="form-group">
+            <label for="surname">Фамилия</label>
+            <input type="text" id="surname" name="surname" placeholder="Фамилия" required>
+        </div>
+        <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Зарегистрировать</button>
+    </form>
+    <p><a class="button" href="/personal/area">Вернуться в личный кабинет</a><p>
+</div>
+</body>
+</html>
