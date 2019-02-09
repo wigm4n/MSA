@@ -2,42 +2,60 @@ package data
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"math"
 	"math/rand"
 	"os"
 	"strconv"
+	"time"
 )
 
 func SomeCode(count int, length int, from int, to int) (res int, err error) {
 	// Создания вариантов в зависимости от вводимого числа N и параметров: n, max, min
-	os.RemoveAll("./result")
-	for i := 1; i < count; i++ {
-		createTask(i, length, to, from)
+	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
+		os.Mkdir("./generated_data", 0755)
+	}
+	t := time.Now()
+	pathHomework := "./generated_data/homework_" + t.Format("Mon Jan _2 15:04:05 2006")
+	os.Mkdir(pathHomework, 0755)
+	for i := 0; i < count; i++ {
+		createTask(i, length, to, from, t.Format("Mon Jan _2 15:04:05 2006"))
 	}
 	res = 1
 	return
 }
 
 // Создание варианта
-func createTask(i, n, max, min int) {
-	os.Mkdir("./result", 0755)
-
-	path := "./result/resultsfile" + strconv.Itoa(i) + ".csv"
-	outfile, err := os.Create(path)
+func createTask(i, n, max, min int, pathHom string) {
+	number := strconv.Itoa(i + 1)
+	path1 := "./generated_data/homework_" + pathHom + "/result"
+	path2 := "./generated_data/homework_" + pathHom + "/professor_data"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
+	pathResults := path1 + "/resultsfile-" + number + ".csv"
+	pathProfData := path2 + "/proffile-" + number + ".csv"
+	outfile1, err := os.Create(pathResults)
+	outfile2, err := os.Create(pathProfData)
 	if err != nil {
 		log.Fatal("Unable to open output")
 	}
-	defer outfile.Close()
-	writer := csv.NewWriter(outfile)
+	defer outfile1.Close()
+	defer outfile2.Close()
 
+	writer1 := csv.NewWriter(outfile1)
 	seq := generateSeq(n, max, min)
 	for i := range seq {
-		writer.Write([]string{strconv.Itoa(seq[i])})
+		writer1.Write([]string{strconv.Itoa(seq[i])})
 	}
 
-	writer.Flush()
-	if err := writer.Error(); err != nil {
+	writer2 := csv.NewWriter(outfile2)
+	writer2.WriteAll([][]string{
+		{"Average", fmt.Sprintf("%f", average(seq))}, {"Variance", fmt.Sprintf("%f", variance(seq))}, {"Student value", strconv.Itoa(student())}, {"leftTboard", fmt.Sprintf("%f", leftTboard(seq))}, {"rightTboard", fmt.Sprintf("%f", rightTboard(seq))}})
+
+	writer1.Flush()
+	writer2.Flush()
+	if err := writer1.Error(); err != nil {
 		log.Fatalln("error writing csv:", err)
 	}
 }
