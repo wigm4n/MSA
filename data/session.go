@@ -1,4 +1,4 @@
-package entities
+package data
 
 type Session struct {
 	UserID int

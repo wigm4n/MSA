@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"MSA/auth"
-	"MSA/entities"
+	"MSA/data"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -13,70 +15,70 @@ func GenerateSessionToken() string {
 	return strconv.FormatInt(rand.Int63(), 16)
 }
 
-func ShowRegistrationPage(c *gin.Context) {
-	auth.Render(c, gin.H{
-		"title": "Регистрация"}, "register.html")
-}
-
-func Register(c *gin.Context) {
+func Registration(c *gin.Context) {
 	email := c.PostForm("email")
-	password := c.PostForm("password")
+	firstName := c.PostForm("firstname")
+	lastName := c.PostForm("lastname")
 
-	// проверить, существует ли уже пользователь в базе
-	isAllCorrect := true
+	newUser := data.User{Email: email, FirstName: firstName, LastName: lastName}
 
-	newUser := entities.User{}
-	// присвоить новый id, исходя из базы
-	count := 1
+	isAllCorrect, err := data.IsExist(email)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	if isAllCorrect == true {
-		newUser = entities.User{ID: count, Email: email, Password: password}
+		newUser.Password, _ = data.GenerateNewPassword()
+		fmt.Println(newUser.Password)
 		if err := newUser.RegisterNewUser(); err == nil {
 			token := GenerateSessionToken()
 			c.SetCookie("token", token, 3600, "", "", false, true)
 			c.Set("is_logged_in", true)
 
-			entities.DeleteSessionByUserID(newUser.ID)
-			newUser.CreateSession()
+			//?????
+			//data.DeleteSessionByUserID(newUser.ID)
+			//newUser.CreateSession()
 
 			auth.Render(c, gin.H{
-				"title": "Личный кабинет"}, "login-successful.html")
+				"title": "Личный кабинет"}, "prof-registration-successful.html")
 
 		} else {
-			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+			c.HTML(http.StatusBadRequest, "prof-registration.html", gin.H{
 				"ErrorTitle":   "Ошибка регистрации",
 				"ErrorMessage": err.Error()})
 
 		}
 	} else {
-		c.HTML(http.StatusBadRequest, "register.html", gin.H{
+		c.HTML(http.StatusBadRequest, "prof-registration.html", gin.H{
 			"ErrorTitle":   "Ошибка регистрации",
 			"ErrorMessage": "Указанный email уже зарегистрирован"})
 	}
 }
 
 func ShowLoginPage(c *gin.Context) {
-	auth.Render(c, gin.H{"title": "MSA"}, "main-page.html")
+	auth.Render(c, gin.H{"title": "MSA"}, "prof-login.html")
 }
 
 func PerformLogin(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
-	if entities.IsUserValid(email, password) {
-		user, _ := entities.GetUserByEmail(email)
+	if data.IsUserValid(email, password) {
+		user, _ := data.GetUserByEmail(email)
 		token := GenerateSessionToken()
 		c.SetCookie("token", token, 3600, "", "", false, true)
 		c.Set("is_logged_in", true)
 
-		entities.DeleteSessionByUserID(user.ID)
+		//??????
+		data.DeleteSessionByUserID(user.ID)
 		user.CreateSession()
 
 		auth.Render(c, gin.H{
-			"title": "Личный кабинет"}, "personal-area.html")
+			"title": "Личный кабинет"}, "prof-personal-area.html")
 
 	} else {
-		c.HTML(http.StatusUnauthorized, "main-page.html", gin.H{
+		c.HTML(http.StatusUnauthorized, "prof-login.html", gin.H{
 			"ErrorTitle":   "Ошибка авторизации",
 			"ErrorMessage": "Неверные данные учетной записи"})
 	}
@@ -87,8 +89,8 @@ func Logout(c *gin.Context) {
 
 	// передать ID текущего пользователя
 	id := 1
-	entities.DeleteSessionByUserID(id)
+	data.DeleteSessionByUserID(id)
 
 	auth.Render(c,
-		gin.H{"title": "Главная страница"}, "main-page.html")
+		gin.H{"title": "Главная страница"}, "index.html")
 }

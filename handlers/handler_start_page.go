@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ShowPersonalAreaPage(c *gin.Context) {
+func ShowMainPage(c *gin.Context) {
 	auth.Render(c,
 		gin.H{"title": "Главная страница"},
-		"prof-personal-area.html")
+		"index.html")
 }

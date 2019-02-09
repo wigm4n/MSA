@@ -9,14 +9,14 @@
 <div class="form">
     <h2>Страница регистрации нового преподавателя</h2>
     <h3>Введите имя, фамилию и email преподавателя.<br>Информация с логином и паролем придет на указанную почту.</h3>
-    <form class="form" action="/auth/register" method="POST">
+    <form class="form" action="/prof/registration-successful" method="POST">
         <div>
             <label for="name">Имя</label>
-            <input type="text" id="name" name="name" placeholder="Имя" required>
+            <input type="text" id="firstname" name="firstname" placeholder="Имя" required>
         </div>
         <div class="form-group">
             <label for="surname">Фамилия</label>
-            <input type="text" id="surname" name="surname" placeholder="Фамилия" required>
+            <input type="text" id="lastname" name="lastname" placeholder="Фамилия" required>
         </div>
         <div>
             <label for="email">Email</label>
@@ -24,7 +24,7 @@
         </div>
         <button type="submit" class="btn btn-primary">Зарегистрировать</button>
     </form>
-    <p><a class="button" href="/personal/area">Вернуться в личный кабинет</a><p>
+    <p><a class="button" href="/prof/personal-area">Вернуться в личный кабинет</a><p>
 </div>
 </body>
 </html>

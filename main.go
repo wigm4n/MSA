@@ -2,8 +2,11 @@ package main
 
 import (
 	"MSA/auth"
+	"MSA/data"
 	"MSA/handlers"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 	"net/http"
 )
 
@@ -13,7 +16,15 @@ func main() {
 	router = gin.Default()
 	router.LoadHTMLGlob("templates/*")
 	initializeRoutes()
+	//initUser()
 	router.Run()
+}
+
+func initUser() {
+	user := data.User{Email: "test3@hse.ru", FirstName: "name", LastName: "lastname"}
+	user.Password, _ = data.GenerateNewPassword()
+	fmt.Println(user.Password)
+	user.RegisterNewUser()
 }
 
 func initializeRoutes() {
@@ -26,20 +37,31 @@ func initializeRoutes() {
 	// Стартовая страница
 	router.GET("/", handlers.ShowMainPage)
 
-	userRoutes := router.Group("/auth")
+	userProf := router.Group("/prof")
 	{
-		userRoutes.GET("/register", auth.EnsureLoggedIn(), handlers.ShowRegistrationPage)
-		userRoutes.POST("/register", auth.EnsureLoggedIn(), handlers.Register)
+		userProf.GET("/login", handlers.ShowLoginPage)
 
-		userRoutes.GET("/login", handlers.ShowLoginPage)
-		userRoutes.POST("/login", handlers.PerformLogin)
+		userProf.GET("/logout", auth.EnsureLoggedIn(), handlers.Logout)
 
-		userRoutes.GET("/logout", auth.EnsureLoggedIn(), handlers.Logout)
+		userProf.GET("/create-task", auth.EnsureLoggedIn(), handlers.ShowTaskCreationPage)
+
+		userProf.POST("/create-task-successful", auth.EnsureLoggedIn(), handlers.CreateTask)
+
+		userProf.GET("/get-tasks", auth.EnsureLoggedIn(), handlers.ShowTaskGettingPage)
+
+		userProf.GET("/registration", auth.EnsureLoggedIn(), handlers.ShowRegistrationPage)
+
+		userProf.POST("/registration-successful", auth.EnsureLoggedIn(), handlers.Registration)
+
+		userProf.GET("/forum", auth.EnsureLoggedIn(), handlers.ShowForumPage)
+
+		userProf.GET("/personal-area", auth.EnsureLoggedIn(), handlers.ShowPersonalAreaPage)
+		userProf.POST("/personal-area", auth.EnsureLoggedIn(), handlers.PerformLogin)
 	}
 
-	personalAreaRoutes := router.Group("/personal")
+	userStudent := router.Group("/student")
 	{
-		personalAreaRoutes.GET("/area", auth.EnsureLoggedIn(), handlers.ShowPersonalAreaPage)
+		userStudent.POST("/", handlers.ShowStudentPage)
 	}
 }
 
