@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MSA</title>
+</head>
+<body>
+<div class="form">
+    <h2>Давайте создадим первое задание для студентиков!</h2>
+
+    <form action="/prof/create-task-successful" method = "POST">
+        <div>
+            <label for="count">Количество вариантов</label>
+            <input type="number" id="count" name="count" placeholder="Количество" required>
+        </div>
+        <div>
+            <label for="length">Длина выборки</label>
+            <input type="number" id="length" name="length" placeholder="Длина" required>
+        </div>
+        <div>
+            <label for="from">От</label>
+            <input type="number" id="from" name="from" placeholder="От" required>
+        </div>
+        <div>
+            <label for="to">До</label>
+            <input type="number" id="to" name="to" placeholder="До" required>
+        </div>
+        <button type="submit">Создать</button>
+    </form>
+</div>
+</body>
+</html>
