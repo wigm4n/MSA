@@ -61,6 +61,7 @@ func ShowLoginPage(c *gin.Context) {
 }
 
 func PerformLogin(c *gin.Context) {
+	fmt.Println("in perform")
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 

@@ -44,6 +44,7 @@ func IsUserValid(email string, password string) (exists bool) {
 		return false
 	}
 	if user.Password == Encrypt(password) {
+
 		return true
 	}
 	return false
