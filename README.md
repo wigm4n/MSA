@@ -3,6 +3,8 @@ Team project of 4th year students of the Computer Science Department of the High
 
 ## How to build and run project:
 1. Go to project's package
-2. Open the terminal and type "go build"
-3. Run the executable file
-4. Go to localhost page (localhost:8080/)
+2. Set up your PostgreSQL database as it specified in setup.sql
+3. Modify properties.json file to specify your Postgres credentials
+4. Open the terminal and type "go build"
+5. Run the executable file
+6. Go to localhost page (localhost:8080/)
