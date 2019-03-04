@@ -5,6 +5,7 @@ type Session struct {
 }
 
 func (user User) CreateSession() (err error) {
+	GenerateNewPassword()
 	//Создать сессию в базе
 	return
 }

@@ -20,6 +20,7 @@ func main() {
 	// ЭТО ДЛЯ СТАРОЙ ВЕРСИИ, РАСКОММЕНТИРОВАТЬ, ЕСЛИ ХОЧЕШЬ СТАРЫЕ ПУТИ
 	//router = gin.Default()
 	//router.LoadHTMLGlob("templates/*")
+	//test()
 	//initializeRoutes()
 	//initUser()
 	//router.Run()
@@ -45,6 +46,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "ParseForm() err: %v", err)
 		return
 	}
+	fmt.Println(r)
 
 	type Task struct {
 		Count  int

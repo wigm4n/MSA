@@ -3,7 +3,6 @@ package handlers
 import (
 	"MSA/auth"
 	"MSA/data"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"math/rand"
@@ -30,7 +29,6 @@ func Registration(c *gin.Context) {
 
 	if isAllCorrect == true {
 		newUser.Password, _ = data.GenerateNewPassword()
-		fmt.Println(newUser.Password)
 		if err := newUser.RegisterNewUser(); err == nil {
 			token := GenerateSessionToken()
 			c.SetCookie("token", token, 3600, "", "", false, true)
@@ -61,7 +59,6 @@ func ShowLoginPage(c *gin.Context) {
 }
 
 func PerformLogin(c *gin.Context) {
-	fmt.Println("in perform")
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
