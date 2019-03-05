@@ -16,7 +16,7 @@ func main() {
 	router = gin.Default()
 	router.LoadHTMLGlob("templates/*")
 	initializeRoutes()
-	//initUser()
+	initUser()
 	router.Run()
 }
 
