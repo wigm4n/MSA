@@ -44,10 +44,14 @@ func IsUserValid(email string, password string) (exists bool) {
 		return false
 	}
 	if user.Password == Encrypt(password) {
-
 		return true
 	}
 	return false
+}
+
+func ResetPassword(email string) (exists bool) {
+	// TODO: сделать сервис email и восстановку пароля
+	return true
 }
 
 //получение пользователя по email
