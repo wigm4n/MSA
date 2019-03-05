@@ -1,24 +1,20 @@
 package handlers
 
 import (
-	"MSA/auth"
 	"MSA/data"
-	"fmt"
-	"github.com/gin-gonic/gin"
+	"MSA/json_responses"
 	"log"
-	"math/rand"
 	"net/http"
-	"strconv"
 )
 
-func GenerateSessionToken() string {
-	return strconv.FormatInt(rand.Int63(), 16)
-}
-
-func Registration(c *gin.Context) {
-	email := c.PostForm("email")
-	firstName := c.PostForm("firstname")
-	lastName := c.PostForm("lastname")
+func Registration(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		log.Fatalln("ParseForm() err:", err)
+		return
+	}
+	email := r.FormValue("email")
+	firstName := r.FormValue("firstname")
+	lastName := r.FormValue("lastname")
 
 	newUser := data.User{Email: email, FirstName: firstName, LastName: lastName}
 
@@ -30,67 +26,43 @@ func Registration(c *gin.Context) {
 
 	if isAllCorrect == true {
 		newUser.Password, _ = data.GenerateNewPassword()
-		fmt.Println(newUser.Password)
 		if err := newUser.RegisterNewUser(); err == nil {
-			token := GenerateSessionToken()
-			c.SetCookie("token", token, 3600, "", "", false, true)
-			c.Set("is_logged_in", true)
-
-			//?????
-			//data.DeleteSessionByUserID(newUser.ID)
-			//newUser.CreateSession()
-
-			auth.Render(c, gin.H{
-				"title": "Личный кабинет"}, "prof-registration-successful.html")
-
+			response, _ := json_responses.ReturnStatus(true)
+			w.Write(response)
 		} else {
-			c.HTML(http.StatusBadRequest, "prof-registration.html", gin.H{
-				"ErrorTitle":   "Ошибка регистрации",
-				"ErrorMessage": err.Error()})
-
+			response, _ := json_responses.ReturnStatus(false)
+			w.Write(response)
 		}
 	} else {
-		c.HTML(http.StatusBadRequest, "prof-registration.html", gin.H{
-			"ErrorTitle":   "Ошибка регистрации",
-			"ErrorMessage": "Указанный email уже зарегистрирован"})
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
 	}
 }
 
-func ShowLoginPage(c *gin.Context) {
-	auth.Render(c, gin.H{"title": "MSA"}, "prof-login.html")
-}
-
-func PerformLogin(c *gin.Context) {
-	email := c.PostForm("email")
-	password := c.PostForm("password")
+func PerformLogin(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		log.Fatalln("ParseForm() err:", err)
+		return
+	}
+	email := r.FormValue("email")
+	password := r.FormValue("password")
 
 	if data.IsUserValid(email, password) {
-		user, _ := data.GetUserByEmail(email)
-		token := GenerateSessionToken()
-		c.SetCookie("token", token, 3600, "", "", false, true)
-		c.Set("is_logged_in", true)
-
-		//??????
-		data.DeleteSessionByUserID(user.ID)
-		user.CreateSession()
-
-		auth.Render(c, gin.H{
-			"title": "Личный кабинет"}, "prof-personal-area.html")
-
+		response, _ := json_responses.ReturnStatus(true)
+		w.Write(response)
 	} else {
-		c.HTML(http.StatusUnauthorized, "prof-login.html", gin.H{
-			"ErrorTitle":   "Ошибка авторизации",
-			"ErrorMessage": "Неверные данные учетной записи"})
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
 	}
 }
 
-func Logout(c *gin.Context) {
-	c.SetCookie("token", "", -1, "", "", false, true)
-
-	// передать ID текущего пользователя
-	id := 1
-	data.DeleteSessionByUserID(id)
-
-	auth.Render(c,
-		gin.H{"title": "Главная страница"}, "index.html")
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		log.Fatalln("ParseForm() err:", err)
+		return
+	}
+	email := r.FormValue("email")
+	status := data.ResetPassword(email)
+	response, _ := json_responses.ReturnStatus(status)
+	w.Write(response)
 }

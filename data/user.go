@@ -49,6 +49,11 @@ func IsUserValid(email string, password string) (exists bool) {
 	return false
 }
 
+func ResetPassword(email string) (exists bool) {
+	// TODO: сделать сервис email и восстановку пароля
+	return true
+}
+
 //получение пользователя по email
 func GetUserByEmail(email string) (user User, err error) {
 	err = db.QueryRow("SELECT id, email, firstname, lastname, password FROM users WHERE email = $1", email).
