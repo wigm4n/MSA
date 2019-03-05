@@ -3,6 +3,7 @@ package handlers
 import (
 	"MSA/data"
 	"MSA/json_responses"
+	"MSA/sampling"
 	"log"
 	"net/http"
 	"strconv"
@@ -40,6 +41,15 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Read task params from user:", taskExtended)
 
+	taskExtended.Count = 10
+	taskExtended.Alpha = 0.05
+	taskExtended.Size = 10
+	taskExtended.Size2 = 10
+	taskExtended.Size3 = 10
+	taskExtended.Min = 1
+	taskExtended.Max = 100
+	taskExtended.TaskType = 6
+
 	//===== запись в базу данных
 	taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskType)
 	taskForDB.CreateNewTaskInDB()
@@ -60,17 +70,17 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 func (task TaskType) TaskType(taskExtended data.TaskExtended) bool {
 	switch task {
 	case Task1:
-		return true
+		return sampling.ReturnTask1(taskExtended)
 	case Task2:
-		return true
+		return sampling.ReturnTask2(taskExtended)
 	case Task3:
-		return true
+		return sampling.ReturnTask3(taskExtended)
 	case Task4:
-		return true
+		return sampling.ReturnTask4(taskExtended)
 	case Task5:
-		return true
+		return sampling.ReturnTask5(taskExtended)
 	case Task6:
-		return true
+		return sampling.ReturnTask6(taskExtended)
 	default:
 		return false
 	}

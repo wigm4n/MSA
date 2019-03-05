@@ -2,8 +2,6 @@ package main
 
 import (
 	"MSA/handlers"
-	"MSA/sampling"
-	"fmt"
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
@@ -13,15 +11,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("assets")))
 	initRoutes()
 	log.Println("Listening port 8080...")
-	http.ListenAndServe(":8080", nil)
-
-	//fmt.Println(sampling.ReturnTask1(10, 1, 100, 10, 0.05))
-	//fmt.Println(sampling.ReturnTask2(10, 1, 100, 10, 0.05))
-	//fmt.Println(sampling.ReturnTask3(10, 1, 100, 10, 0.05))
-	//fmt.Println(sampling.ReturnTask4(10,  0.05))
-	//fmt.Println(sampling.ReturnTask5(10, 1, 100, 10, 0.05))
-	fmt.Println(sampling.ReturnTask6(10, 1, 100, 10, 10, 10, 0.05))
-
+	http.ListenAndServe(":9090", nil)
 }
 
 func initRoutes() {

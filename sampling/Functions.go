@@ -1,6 +1,7 @@
 package sampling
 
 import (
+	"MSA/data"
 	"math"
 	"math/rand"
 	"os"
@@ -180,7 +181,7 @@ func Tss(seq1, seq2, seq3 []int) (q float64) {
 	return
 }
 
-func ReturnTask1(count, min, max, n int, alpha float64) bool {
+func ReturnTask1(taskExtended data.TaskExtended) bool {
 	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
 		os.Mkdir("./generated_data", 0755)
 	}
@@ -195,18 +196,18 @@ func ReturnTask1(count, min, max, n int, alpha float64) bool {
 	os.Mkdir(path1, 0755)
 	os.Mkdir(path2, 0755)
 
-	for i := 0; i < count; i++ {
+	for i := 0; i < taskExtended.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task1(min, max, n, alpha, pathResults, pathProfData) {
+		if !Task1(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
 	return true
 }
 
-func ReturnTask2(count, min, max, n int, alpha float64) bool {
+func ReturnTask2(taskExtended data.TaskExtended) bool {
 	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
 		os.Mkdir("./generated_data", 0755)
 	}
@@ -221,19 +222,18 @@ func ReturnTask2(count, min, max, n int, alpha float64) bool {
 	os.Mkdir(path1, 0755)
 	os.Mkdir(path2, 0755)
 
-	for i := 0; i < count; i++ {
+	for i := 0; i < taskExtended.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		Task2(min, max, n, alpha, pathResults, pathProfData)
-		if !Task2(min, max, n, alpha, pathResults, pathProfData) {
+		if !Task2(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
 	return true
 }
 
-func ReturnTask3(count, min, max, n int, alpha float64) bool {
+func ReturnTask3(taskExtended data.TaskExtended) bool {
 	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
 		os.Mkdir("./generated_data", 0755)
 	}
@@ -248,18 +248,18 @@ func ReturnTask3(count, min, max, n int, alpha float64) bool {
 	os.Mkdir(path1, 0755)
 	os.Mkdir(path2, 0755)
 
-	for i := 0; i < count; i++ {
+	for i := 0; i < taskExtended.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task3(min, max, n, alpha, pathResults, pathProfData) {
+		if !Task3(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
 	return true
 }
 
-func ReturnTask4(count int, alpha float64) bool {
+func ReturnTask4(taskExtended data.TaskExtended) bool {
 	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
 		os.Mkdir("./generated_data", 0755)
 	}
@@ -274,18 +274,18 @@ func ReturnTask4(count int, alpha float64) bool {
 	os.Mkdir(path1, 0755)
 	os.Mkdir(path2, 0755)
 
-	for i := 0; i < count; i++ {
+	for i := 0; i < taskExtended.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task4(alpha, pathResults, pathProfData) {
+		if !Task4(taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
 	return true
 }
 
-func ReturnTask5(count, min, max, n int, alpha float64) bool {
+func ReturnTask5(taskExtended data.TaskExtended) bool {
 	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
 		os.Mkdir("./generated_data", 0755)
 	}
@@ -300,18 +300,18 @@ func ReturnTask5(count, min, max, n int, alpha float64) bool {
 	os.Mkdir(path1, 0755)
 	os.Mkdir(path2, 0755)
 
-	for i := 0; i < count; i++ {
+	for i := 0; i < taskExtended.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task5(min, max, n, alpha, pathResults, pathProfData) {
+		if !Task5(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
 	return true
 }
 
-func ReturnTask6(count, min, max, n1, n2, n3 int, alpha float64) bool {
+func ReturnTask6(taskExtended data.TaskExtended) bool {
 	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
 		os.Mkdir("./generated_data", 0755)
 	}
@@ -326,11 +326,12 @@ func ReturnTask6(count, min, max, n1, n2, n3 int, alpha float64) bool {
 	os.Mkdir(path1, 0755)
 	os.Mkdir(path2, 0755)
 
-	for i := 0; i < count; i++ {
+	for i := 0; i < taskExtended.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task6(min, max, n1, n2, n3, alpha, pathResults, pathProfData) {
+		if !Task6(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Size2, taskExtended.Size3,
+			taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
