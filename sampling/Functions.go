@@ -1,8 +1,6 @@
 package sampling
 
 import (
-	"fmt"
-	"github.com/tealeg/xlsx"
 	"math"
 	"math/rand"
 	"os"
@@ -53,7 +51,7 @@ func MaxOfThree(x1, x2, x3 float64) float64 {
 
 // Генерация чисел
 func GenerateSeq(max, min, n int) (seq []int) {
-	for i := 0; i <= n; i++ {
+	for i := 0; i < n; i++ {
 		seq = append(seq, GetRand(min, max))
 	}
 	return
@@ -88,7 +86,7 @@ func Variance(seq []int) float64 {
 // Объединение двух последовательностей
 func ConcatForTwo(seq1, seq2 []int) (finalSeq []int) {
 	for j := 0; j < 2; j++ {
-		for i := 0; i <= len(seq1); i++ {
+		for i := 0; i < len(seq1); i++ {
 			if j == 0 {
 				finalSeq = append(finalSeq, seq1[i])
 			} else {
@@ -102,7 +100,7 @@ func ConcatForTwo(seq1, seq2 []int) (finalSeq []int) {
 // Объединение трёх последовательностей
 func ConcatForThree(seq1, seq2, seq3 []int) (finalSeq []int) {
 	for j := 0; j < 3; j++ {
-		for i := 0; i <= len(seq1); i++ {
+		for i := 0; i < len(seq1); i++ {
 			switch {
 			case j == 0:
 				finalSeq = append(finalSeq, seq1[i])
@@ -129,7 +127,7 @@ func Q2(seq1, seq2, seq3 []int) float64 {
 	var q = 0.0
 	for j := 0; j < 3; j++ {
 		seq := arr[j]
-		for i := 0; i <= len(seq); i++ {
+		for i := 0; i < len(seq); i++ {
 			diff := float64(seq[i]) - Average(seq)
 			diff *= diff
 			q += diff
@@ -182,7 +180,7 @@ func Tss(seq1, seq2, seq3 []int) (q float64) {
 	return
 }
 
-func ReturnTask(count int, task map[string][]int, answer map[string]float64, compare map[string]bool, taskID int) bool {
+func ReturnTask1(count, min, max, n int, alpha float64) bool {
 	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
 		os.Mkdir("./generated_data", 0755)
 	}
@@ -192,290 +190,149 @@ func ReturnTask(count int, task map[string][]int, answer map[string]float64, com
 	pathHomework := "./generated_data/homework_" + timeTask
 	os.Mkdir(pathHomework, 0755)
 
-	for i := 0; i < count; i++ {
-		path1 := "./generated_data/homework_" + timeTask + "/result"
-		path2 := "./generated_data/homework_" + timeTask + "/professor_data"
-		os.Mkdir(path1, 0755)
-		os.Mkdir(path2, 0755)
+	path1 := "./generated_data/homework_" + timeTask + "/result"
+	path2 := "./generated_data/homework_" + timeTask + "/professor_data"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 
+	for i := 0; i < count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-
-		if taskID == 1 {
-			return task1XLSX(pathResults, pathProfData, task, answer, compare)
+		if !Task1(min, max, n, alpha, pathResults, pathProfData) {
+			return false
 		}
-		if taskID == 2 {
-			return task2XLSX(pathResults, pathProfData, task, answer)
-		}
-		if taskID == 3 {
-			return task3XLSX(pathResults, pathProfData, task, answer)
-		}
-		if taskID == 4 {
-			return task4XLSX(pathResults, pathProfData, answer)
-		}
-		if taskID == 5 {
-			return task5XLSX(pathResults, pathProfData, task, answer)
-		}
-		if taskID == 6 {
-			return task6XLSX(pathResults, pathProfData, task, answer)
-		}
-	}
-	return false
-}
-
-func task1XLSX(pathResults, pathProfData string, task map[string][]int, answer map[string]float64, compare map[string]bool) bool {
-	// Для студента
-	fileSt := xlsx.NewFile()
-	sheet1, err1 := fileSt.AddSheet("Sheet1")
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
-	}
-	seq := task["seq"]
-
-	rowSt1 := sheet1.AddRow()
-	cellSt1 := rowSt1.AddCell()
-	cellSt1.Value = fmt.Sprintf("%f", answer["cnst"])
-
-	rowSt2 := sheet1.AddRow()
-	rowSt2.WriteSlice(seq, len(seq))
-	err1 = fileSt.Save(pathResults)
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
-	}
-
-	// Для преподавателя
-	filePr := xlsx.NewFile()
-	sheet2, err2 := filePr.AddSheet("Sheet1")
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
-	}
-	rowPr1 := sheet2.AddRow()
-	rowPr1.WriteSlice([]string{"Sample mean", "Sample variance", "tStatistic", "tcrit1", "tcrit2", "Hypothesis true?:"}, 6)
-
-	rowPr2 := sheet2.AddRow()
-	rowPr2.WriteSlice([]string{fmt.Sprintf("%f", answer["m"]), fmt.Sprintf("%f", answer["Sigma"]), fmt.Sprintf("%f", answer["TStatistic"]), fmt.Sprintf("%f", answer["tcrit1"]), fmt.Sprintf("%f", answer["tcrit2"]), strconv.FormatBool(compare["answer"])}, 6)
-
-	err2 = filePr.Save(pathProfData)
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
 	}
 	return true
 }
 
-func task2XLSX(pathResults, pathProfData string, task map[string][]int, answer map[string]float64) bool {
-	// Для студента
-	fileSt := xlsx.NewFile()
-	sheet1, err1 := fileSt.AddSheet("Sheet1")
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
-	}
-	seq := task["seq"]
-
-	rowSt1 := sheet1.AddRow()
-	rowSt1.WriteSlice(seq, len(seq))
-	err1 = fileSt.Save(pathResults)
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
+func ReturnTask2(count, min, max, n int, alpha float64) bool {
+	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
+		os.Mkdir("./generated_data", 0755)
 	}
 
-	// Для преподавателя
-	filePr := xlsx.NewFile()
-	sheet2, err2 := filePr.AddSheet("Sheet1")
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
-	}
-	rowPr1 := sheet2.AddRow()
-	rowPr1.WriteSlice([]string{"Sample mean", "Variance", "tcrit1", "leftBoard", "rightBoard"}, 5)
+	t := time.Now()
+	timeTask := t.Format("Mon Jan _2 15:04:05 2006")
+	pathHomework := "./generated_data/homework_" + timeTask
+	os.Mkdir(pathHomework, 0755)
 
-	rowPr2 := sheet2.AddRow()
-	rowPr2.WriteSlice([]string{fmt.Sprintf("%f", answer["m"]), fmt.Sprintf("%f", answer["Sigma"]), fmt.Sprintf("%f", answer["tcrit1"]), fmt.Sprintf("%f", answer["leftBoard"]), fmt.Sprintf("%f", answer["rightBoard"])}, 5)
+	path1 := "./generated_data/homework_" + timeTask + "/result"
+	path2 := "./generated_data/homework_" + timeTask + "/professor_data"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 
-	err2 = filePr.Save(pathProfData)
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
+	for i := 0; i < count; i++ {
+		number := strconv.Itoa(i + 1)
+		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
+		pathProfData := path2 + "/proffile-" + number + ".xlsx"
+		Task2(min, max, n, alpha, pathResults, pathProfData)
+		if !Task2(min, max, n, alpha, pathResults, pathProfData) {
+			return false
+		}
 	}
 	return true
 }
 
-func task3XLSX(pathResults, pathProfData string, task map[string][]int, answer map[string]float64) bool {
-	// Для студента
-	fileSt := xlsx.NewFile()
-	sheet1, err1 := fileSt.AddSheet("Sheet1")
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
-	}
-	seq1 := task["seq1"]
-	seq2 := task["seq2"]
-
-	rowSt1 := sheet1.AddRow()
-	rowSt1.WriteSlice(seq1, len(seq1))
-
-	rowSt2 := sheet1.AddRow()
-	rowSt2.WriteSlice(seq2, len(seq2))
-	err1 = fileSt.Save(pathResults)
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
+func ReturnTask3(count, min, max, n int, alpha float64) bool {
+	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
+		os.Mkdir("./generated_data", 0755)
 	}
 
-	// Для преподавателя
-	filePr := xlsx.NewFile()
-	sheet2, err2 := filePr.AddSheet("Sheet1")
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
-	}
-	rowPr1 := sheet2.AddRow()
-	rowPr1.WriteSlice([]string{"Sample mean1", "Sample mean2", "Sample variance1", "Sample variance2", "ZStatistic", "ucrit1", "ucrit2"}, 7)
+	t := time.Now()
+	timeTask := t.Format("Mon Jan _2 15:04:05 2006")
+	pathHomework := "./generated_data/homework_" + timeTask
+	os.Mkdir(pathHomework, 0755)
 
-	rowPr2 := sheet2.AddRow()
-	rowPr2.WriteSlice([]string{fmt.Sprintf("%f", answer["m1"]), fmt.Sprintf("%f", answer["m2"]), fmt.Sprintf("%f", answer["Sigma1"]), fmt.Sprintf("%f", answer["Sigma2"]), fmt.Sprintf("%f", answer["ZStatistic"]), fmt.Sprintf("%f", answer["ucrit1"]), fmt.Sprintf("%f", answer["ucrit2"])}, 7)
+	path1 := "./generated_data/homework_" + timeTask + "/result"
+	path2 := "./generated_data/homework_" + timeTask + "/professor_data"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 
-	err2 = filePr.Save(pathProfData)
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
+	for i := 0; i < count; i++ {
+		number := strconv.Itoa(i + 1)
+		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
+		pathProfData := path2 + "/proffile-" + number + ".xlsx"
+		if !Task3(min, max, n, alpha, pathResults, pathProfData) {
+			return false
+		}
 	}
 	return true
 }
 
-func task4XLSX(pathResults, pathProfData string, answer map[string]float64) bool {
-	// Для студента
-	fileSt := xlsx.NewFile()
-	sheet1, err1 := fileSt.AddSheet("Sheet1")
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
+func ReturnTask4(count int, alpha float64) bool {
+	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
+		os.Mkdir("./generated_data", 0755)
 	}
 
-	rowSt1 := sheet1.AddRow()
-	rowSt1.WriteSlice([]string{"n1", "M1", "n2", "M2"}, 4)
+	t := time.Now()
+	timeTask := t.Format("Mon Jan _2 15:04:05 2006")
+	pathHomework := "./generated_data/homework_" + timeTask
+	os.Mkdir(pathHomework, 0755)
 
-	rowSt2 := sheet1.AddRow()
-	rowSt2.WriteSlice([]string{fmt.Sprintf("%f", answer["n1"]), fmt.Sprintf("%f", answer["m1"]), fmt.Sprintf("%f", answer["n2"]), fmt.Sprintf("%f", answer["m2"])}, 4)
-	err1 = fileSt.Save(pathResults)
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
-	}
+	path1 := "./generated_data/homework_" + timeTask + "/result"
+	path2 := "./generated_data/homework_" + timeTask + "/professor_data"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 
-	// Для преподавателя
-	filePr := xlsx.NewFile()
-	sheet2, err2 := filePr.AddSheet("Sheet1")
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
-	}
-	rowPr1 := sheet2.AddRow()
-	rowPr1.WriteSlice([]string{"p1", "p2", "ZStatistic", "ucrit1", "ucrit2"}, 5)
-
-	rowPr2 := sheet2.AddRow()
-	rowPr2.WriteSlice([]string{fmt.Sprintf("%f", answer["p1"]), fmt.Sprintf("%f", answer["p2"]), fmt.Sprintf("%f", answer["ZStatistic"]), fmt.Sprintf("%f", answer["ucrit1"]), fmt.Sprintf("%f", answer["ucrit2"])}, 5)
-
-	err2 = filePr.Save(pathProfData)
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
+	for i := 0; i < count; i++ {
+		number := strconv.Itoa(i + 1)
+		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
+		pathProfData := path2 + "/proffile-" + number + ".xlsx"
+		if !Task4(alpha, pathResults, pathProfData) {
+			return false
+		}
 	}
 	return true
 }
 
-func task5XLSX(pathResults, pathProfData string, task map[string][]int, answer map[string]float64) bool {
-	// Для студента
-	fileSt := xlsx.NewFile()
-	sheet1, err1 := fileSt.AddSheet("Sheet1")
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
-	}
-	seq1 := task["seq1"]
-	seq2 := task["seq2"]
-
-	rowSt1 := sheet1.AddRow()
-	rowSt1.WriteSlice(seq1, len(seq1))
-
-	rowSt2 := sheet1.AddRow()
-	rowSt2.WriteSlice(seq2, len(seq2))
-	err1 = fileSt.Save(pathResults)
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
+func ReturnTask5(count, min, max, n int, alpha float64) bool {
+	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
+		os.Mkdir("./generated_data", 0755)
 	}
 
-	// Для преподавателя
-	filePr := xlsx.NewFile()
-	sheet2, err2 := filePr.AddSheet("Sheet1")
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
-	}
-	rowPr1 := sheet2.AddRow()
-	rowPr1.WriteSlice([]string{"Sigma1", "Sigma2", "FStatistic", "fcrit1left", "fcrit1right", "fcrit2left", "fcrit2right", "fcrit3left", "fcrit3right", "fcrit4left", "fcrit4right"}, 11)
+	t := time.Now()
+	timeTask := t.Format("Mon Jan _2 15:04:05 2006")
+	pathHomework := "./generated_data/homework_" + timeTask
+	os.Mkdir(pathHomework, 0755)
 
-	rowPr2 := sheet2.AddRow()
-	rowPr2.WriteSlice([]string{fmt.Sprintf("%f", answer["Sigma1"]), fmt.Sprintf("%f", answer["Sigma2"]), fmt.Sprintf("%f", answer["F"]), fmt.Sprintf("%f", answer["fcrit1left"]), fmt.Sprintf("%f", answer["fcrit1right"]), fmt.Sprintf("%f", answer["fcrit2left"]), fmt.Sprintf("%f", answer["fcrit2right"]), fmt.Sprintf("%f", answer["fcrit3left"]), fmt.Sprintf("%f", answer["fcrit3right"]), fmt.Sprintf("%f", answer["fcrit4left"]), fmt.Sprintf("%f", answer["fcrit4right"])}, 11)
+	path1 := "./generated_data/homework_" + timeTask + "/result"
+	path2 := "./generated_data/homework_" + timeTask + "/professor_data"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 
-	err2 = filePr.Save(pathProfData)
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
+	for i := 0; i < count; i++ {
+		number := strconv.Itoa(i + 1)
+		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
+		pathProfData := path2 + "/proffile-" + number + ".xlsx"
+		if !Task5(min, max, n, alpha, pathResults, pathProfData) {
+			return false
+		}
 	}
 	return true
 }
 
-func task6XLSX(pathResults, pathProfData string, task map[string][]int, answer map[string]float64) bool {
-	// Для студента
-	fileSt := xlsx.NewFile()
-	sheet1, err1 := fileSt.AddSheet("Sheet1")
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
-	}
-	seq1 := task["seq1"]
-	seq2 := task["seq2"]
-	seq3 := task["seq3"]
-
-	rowSt1 := sheet1.AddRow()
-	rowSt1.WriteSlice(seq1, len(seq1))
-
-	rowSt2 := sheet1.AddRow()
-	rowSt2.WriteSlice(seq2, len(seq2))
-
-	rowSt3 := sheet1.AddRow()
-	rowSt3.WriteSlice(seq3, len(seq3))
-	err1 = fileSt.Save(pathResults)
-	if err1 != nil {
-		fmt.Printf(err1.Error())
-		return false
+func ReturnTask6(count, min, max, n1, n2, n3 int, alpha float64) bool {
+	if _, err := os.Stat("./generated_data"); os.IsNotExist(err) {
+		os.Mkdir("./generated_data", 0755)
 	}
 
-	// Для преподавателя
-	filePr := xlsx.NewFile()
-	sheet2, err2 := filePr.AddSheet("Sheet1")
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
-	}
-	rowPr1 := sheet2.AddRow()
-	rowPr1.WriteSlice([]string{"X1", "X2", "X3", "Xc", "TSS", "Q1", "Q2", "F", "fcrit1left", "fcrit1right"}, 10)
+	t := time.Now()
+	timeTask := t.Format("Mon Jan _2 15:04:05 2006")
+	pathHomework := "./generated_data/homework_" + timeTask
+	os.Mkdir(pathHomework, 0755)
 
-	rowPr2 := sheet2.AddRow()
-	rowPr2.WriteSlice([]string{fmt.Sprintf("%f", answer["X1"]), fmt.Sprintf("%f", answer["X2"]), fmt.Sprintf("%f", answer["X3"]), fmt.Sprintf("%f", answer["Xc"]), fmt.Sprintf("%f", answer["TSS"]), fmt.Sprintf("%f", answer["Q1"]), fmt.Sprintf("%f", answer["Q2"]), fmt.Sprintf("%f", answer["F"]), fmt.Sprintf("%f", answer["fcrit1left"]), fmt.Sprintf("%f", answer["fcrit1right"])}, 10)
+	path1 := "./generated_data/homework_" + timeTask + "/result"
+	path2 := "./generated_data/homework_" + timeTask + "/professor_data"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 
-	err2 = filePr.Save(pathProfData)
-	if err2 != nil {
-		fmt.Printf(err2.Error())
-		return false
+	for i := 0; i < count; i++ {
+		number := strconv.Itoa(i + 1)
+		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
+		pathProfData := path2 + "/proffile-" + number + ".xlsx"
+		if !Task6(min, max, n1, n2, n3, alpha, pathResults, pathProfData) {
+			return false
+		}
 	}
 	return true
 }
