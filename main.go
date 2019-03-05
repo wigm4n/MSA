@@ -11,7 +11,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("assets")))
 	initRoutes()
 	log.Println("Listening port 8080...")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":9090", nil)
 }
 
 func initRoutes() {
