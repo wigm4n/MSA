@@ -19,7 +19,7 @@ var key []byte
 
 // Initialize
 func init() {
-	file, err := ioutil.ReadFile("./properties.json")
+	file, err := ioutil.ReadFile("./properties_db.json")
 	if err != nil {
 		log.Printf("File error: %v\n", err)
 		os.Exit(1)
@@ -49,7 +49,7 @@ func init() {
 	return
 }
 
-func GenerateNewPassword() (password string, err error) {
+func GenerateNewPassword() (password string) {
 	bytes := make([]byte, 8)
 	for i := 0; i < 8; i++ {
 		nBig, _ := rand.Int(rand.Reader, big.NewInt(25))

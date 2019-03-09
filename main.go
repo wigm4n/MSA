@@ -4,14 +4,30 @@ import (
 	"MSA/handlers"
 	_ "github.com/lib/pq"
 	"log"
+	"net"
 	"net/http"
+	"os"
 )
 
 func main() {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		os.Stderr.WriteString("Oops: " + err.Error() + "\n")
+		os.Exit(1)
+	}
+
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				os.Stdout.WriteString(ipnet.IP.String() + "\n")
+			}
+		}
+	}
 	http.Handle("/", http.FileServer(http.Dir("assets")))
 	initRoutes()
-	log.Println("Listening port 8080...")
-	http.ListenAndServe(":9090", nil)
+	port := "9090"
+	log.Println("Listening port " + port + "...")
+	http.ListenAndServe(":"+port, nil)
 }
 
 func initRoutes() {

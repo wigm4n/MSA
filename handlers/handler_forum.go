@@ -15,12 +15,25 @@ func GetForums(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	email := r.FormValue("email")
-	//email = "test3@hse.ru"
+	email = "chyps97@gmail.com"
 
-	forums := data.GetForumsByUserName(email)
+	user, err := data.GetUserByEmail(email)
+	if err != nil {
+		log.Println(err, "Ошибка в получении пользователя из базы данных")
+	}
 
-	response, _ := json.Marshal(forums)
-	w.Write(response)
+	forums, err := data.GetForumsByUserName(user.ID)
+	if err != nil {
+		log.Println(err, "Ошибка в получении форумов для пользователя "+email)
+	}
+
+	if !(forums == nil) {
+		response, _ := json.Marshal(forums)
+		w.Write(response)
+	} else {
+		response, _ := json.Marshal(false)
+		w.Write(response)
+	}
 }
 
 func GetForum(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +42,7 @@ func GetForum(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id, _ := strconv.Atoi(r.FormValue("id"))
-	//id = 4
+	id = 1
 
 	messages := data.GetMessagesByForum(id)
 

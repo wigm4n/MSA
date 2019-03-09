@@ -26,6 +26,9 @@ create table messages (
   date              timestamp
 );
 
+insert into users (email, firstname, lastname, password) values ('chyps97@gmail.com', 'Илья', 'Лобанов', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
+
+
 insert into users (email, firstname, lastname, password) values ('test3@hse.ru', 'prep', 'prepov', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
 insert into users (email, firstname, lastname, password) values ('hse2@mail.ru', 'Кирилл', 'Фурманов', '1234');
 
@@ -52,7 +55,6 @@ insert into messages (task_id, user_id, text, date) values (4, 'крокодил
 insert into messages (task_id, user_id, text, date) values (4, 'препод', 'как это решать 2', TIMESTAMP '2019-02-16 15:36:38');
 
 --7110eda4d09e062aa5e4a390b0a572ac0d2c0220
-
 -- insert into task (name, task_type) values ('dz 1', 2);
 -- insert into task (name, task_type) values ('dz 2', 4);
 --

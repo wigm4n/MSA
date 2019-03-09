@@ -200,7 +200,7 @@ func ReturnTask1(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task1(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
+		if !Task1(0, 0, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
@@ -226,7 +226,7 @@ func ReturnTask2(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task2(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
+		if !Task2(0, 0, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
@@ -252,7 +252,7 @@ func ReturnTask3(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task3(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
+		if !Task3(0, 0, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
@@ -304,7 +304,7 @@ func ReturnTask5(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task5(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
+		if !Task5(0, 0, taskExtended.Size, taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
 	}
@@ -330,7 +330,7 @@ func ReturnTask6(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/resultsfile-" + number + ".xlsx"
 		pathProfData := path2 + "/proffile-" + number + ".xlsx"
-		if !Task6(taskExtended.Min, taskExtended.Max, taskExtended.Size, taskExtended.Size2, taskExtended.Size3,
+		if !Task6(0, 0, taskExtended.Size, taskExtended.Size2, taskExtended.Size3,
 			taskExtended.Alpha, pathResults, pathProfData) {
 			return false
 		}
