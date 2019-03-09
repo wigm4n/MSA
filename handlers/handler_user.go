@@ -65,6 +65,8 @@ func PerformLogin(w http.ResponseWriter, r *http.Request) {
 		email = "chyps97@gmail.com"
 		password = "1234"
 		if data.IsUserValid(email, password) {
+			user, _ := data.GetUserByEmail(email)
+			data.AddNewSession(user.ID, token)
 			response, _ := json_responses.ReturnAuthResponse(true, token)
 			w.Write(response)
 		} else {
@@ -102,6 +104,33 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 				response, _ := json_responses.ReturnStatus(false)
 				w.Write(response)
 			}
+		} else {
+			response, _ := json_responses.ReturnStatus(false)
+			w.Write(response)
+		}
+	}
+}
+
+func CheckSession(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		log.Fatalln("ParseForm() err:", err)
+		return
+	}
+	token := r.FormValue("token")
+
+	if testing.IsTestModeOn() {
+		//поменять параметр на false, если хочешь вернуть ошибку
+		response, _ := json_responses.ReturnStatus(true)
+		w.Write(response)
+	} else {
+		exist, err := data.IsTokenExist(token)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		if exist {
+			response, _ := json_responses.ReturnStatus(true)
+			w.Write(response)
 		} else {
 			response, _ := json_responses.ReturnStatus(false)
 			w.Write(response)

@@ -26,11 +26,11 @@ func main() {
 	}
 
 	// ДЛЯ ЗАГЛУШЕК ОТ БД
-	testing.SetTestMode(true)
+	testing.SetTestMode(false)
 
 	http.Handle("/", http.FileServer(http.Dir("assets")))
 	initRoutes()
-	port := "9090"
+	port := "8080"
 	log.Println("Listening port " + port + "...")
 	http.ListenAndServe(":"+port, nil)
 }
@@ -43,4 +43,5 @@ func initRoutes() {
 	http.HandleFunc("/forum", handlers.GetForum)
 	http.HandleFunc("/send_message", handlers.SendMessage)
 	http.HandleFunc("/registration", handlers.Registration)
+	http.HandleFunc("/check_session", handlers.CheckSession)
 }
