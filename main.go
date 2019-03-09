@@ -2,6 +2,7 @@ package main
 
 import (
 	"MSA/handlers"
+	"MSA/testing"
 	_ "github.com/lib/pq"
 	"log"
 	"net"
@@ -23,6 +24,10 @@ func main() {
 			}
 		}
 	}
+
+	// ДЛЯ ЗАГЛУШЕК ОТ БД
+	testing.SetTestMode(true)
+
 	http.Handle("/", http.FileServer(http.Dir("assets")))
 	initRoutes()
 	port := "9090"

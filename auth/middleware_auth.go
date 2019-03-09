@@ -2,8 +2,14 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
+	"math/rand"
 	"net/http"
+	"strconv"
 )
+
+func GenerateSessionToken() string {
+	return strconv.FormatInt(rand.Int63(), 16)
+}
 
 func EnsureLoggedIn() gin.HandlerFunc {
 	return func(c *gin.Context) {
