@@ -7,7 +7,6 @@ import (
 )
 
 type Message struct {
-	ID       int
 	UserName string `json:"username"`
 	Text     string `json:"text"`
 }
@@ -24,18 +23,30 @@ func (message *Message) CreateNewMessage(taskId int) {
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(taskId, message.UserName, message.Text, time.Now()).Scan(&message.ID)
+	stmt.Query(taskId, message.UserName, message.Text, time.Now())
 	return
 }
 
-func GetForumsByUserName(ownerName string) (forums []Task) {
-	rows, err := db.Query("SELECT id, name, date FROM tasks WHERE creator_user_id = $1", ownerName)
+func CreateWelcomeMessage(taskId int, userId string, taskName string) (err error) {
+	statement := "INSERT INTO messages (task_id, user_id, text, date) VALUES ($1, $2, $3, $4)"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer stmt.Close()
+	stmt.Query(taskId, userId, "Этот формум создан для обсуждения задания \""+taskName+"\".", time.Now())
+	return
+}
+
+func GetForumsByUserName(ownerNameId int) (forums []Forum, err error) {
+	rows, err := db.Query("SELECT id, name, date FROM tasks WHERE creator_user_id = $1", ownerNameId)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	for rows.Next() {
-		var task Task
+		var task Forum
 		err = rows.Scan(&task.ID, &task.Name, &task.Date)
 		forums = append(forums, task)
 	}

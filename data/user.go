@@ -49,11 +49,6 @@ func IsUserValid(email string, password string) (exists bool) {
 	return false
 }
 
-func ResetPassword(email string) (exists bool) {
-	// TODO: сделать сервис email и восстановку пароля
-	return true
-}
-
 //получение пользователя по email
 func GetUserByEmail(email string) (user User, err error) {
 	err = db.QueryRow("SELECT id, email, firstname, lastname, password FROM users WHERE email = $1", email).
@@ -63,4 +58,20 @@ func GetUserByEmail(email string) (user User, err error) {
 		return
 	}
 	return
+}
+
+func UpdatePassword(email string, password string) (isSuccess bool) {
+	statement := "UPDATE users SET password = $1 WHERE email = $2"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	defer stmt.Close()
+	_, err = stmt.Query(password, email)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+	return true
 }

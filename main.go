@@ -2,16 +2,37 @@ package main
 
 import (
 	"MSA/handlers"
+	"MSA/testing"
 	_ "github.com/lib/pq"
 	"log"
+	"net"
 	"net/http"
+	"os"
 )
 
 func main() {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		os.Stderr.WriteString("Oops: " + err.Error() + "\n")
+		os.Exit(1)
+	}
+
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				os.Stdout.WriteString(ipnet.IP.String() + "\n")
+			}
+		}
+	}
+
+	// ДЛЯ ЗАГЛУШЕК ОТ БД
+	testing.SetTestMode(true)
+
 	http.Handle("/", http.FileServer(http.Dir("assets")))
 	initRoutes()
-	log.Println("Listening port 8080...")
-	http.ListenAndServe(":9090", nil)
+	port := "8080"
+	log.Println("Listening port " + port + "...")
+	http.ListenAndServe(":"+port, nil)
 }
 
 func initRoutes() {
@@ -22,4 +43,5 @@ func initRoutes() {
 	http.HandleFunc("/forum", handlers.GetForum)
 	http.HandleFunc("/send_message", handlers.SendMessage)
 	http.HandleFunc("/registration", handlers.Registration)
+	http.HandleFunc("/check_session", handlers.CheckSession)
 }
