@@ -26,7 +26,7 @@ func main() {
 	}
 
 	// ДЛЯ ЗАГЛУШЕК ОТ БД
-	testing.SetTestMode(false)
+	testing.SetTestMode(true)
 
 	http.Handle("/", http.FileServer(http.Dir("assets")))
 	initRoutes()
@@ -44,4 +44,8 @@ func initRoutes() {
 	http.HandleFunc("/send_message", handlers.SendMessage)
 	http.HandleFunc("/registration", handlers.Registration)
 	http.HandleFunc("/check_session", handlers.CheckSession)
+	//download_file
+	//getTasks
+	//getTask
+	//deleteTask
 }
