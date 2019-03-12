@@ -51,15 +51,15 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
 		taskExtended.Email = "chyps97@gmail.com"
 		taskExtended.Name = "Домашнее задание №1"
-		taskExtended.TaskType = 1
 		taskExtended.Count = 10
 		taskExtended.Alpha = 0.05
 		taskExtended.Size = 10
-		//taskExtended.Size2 = 10
-		//taskExtended.Size3 = 10
-		taskExtended.ExpectedValue = 12
-		taskExtended.StdDeviation = 0.7
+		taskExtended.Size2 = 10
+		taskExtended.Size3 = 10
+		taskExtended.ExpectedValue = 0
+		taskExtended.StdDeviation = 1
 		taskExtended.DecimalPlaces = 2
+		taskExtended.TaskType = 6
 
 		//===== запись в базу данных
 		taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskType)
@@ -77,11 +77,11 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		}
 		//=====
 
-		//status := TaskType(taskExtended.TaskType).TaskType(taskExtended)
-		//log.Println("Task data generated:", status)
+		status := TaskType(taskExtended.TaskType).TaskType(taskExtended)
+		log.Println("Task data generated:", status)
 
-		//response, err := json_responses.ReturnStatus(status)
-		response, err := json_responses.ReturnStatus(true)
+		response, err := json_responses.ReturnStatus(status)
+		//response, err := json_responses.ReturnStatus(true)
 
 		if err = r.ParseForm(); err != nil {
 			log.Fatalln("Error in the formation of a response from the server... Error is:", err)

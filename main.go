@@ -26,7 +26,7 @@ func main() {
 	}
 
 	// ДЛЯ ЗАГЛУШЕК ОТ БД
-	testing.SetTestMode(false)
+	testing.SetTestMode(true)
 
 	http.Handle("/", http.FileServer(http.Dir("assets")))
 	initRoutes()
