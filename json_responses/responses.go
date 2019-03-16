@@ -3,6 +3,7 @@ package json_responses
 import (
 	"MSA/data"
 	"encoding/json"
+	"log"
 )
 
 type ResponseStatus struct {
@@ -29,6 +30,7 @@ func ReturnStatus(state bool) (response []byte, err error) {
 	} else {
 		responseStatus.Status = "error"
 	}
+	log.Println("Json:", responseStatus)
 	return json.Marshal(responseStatus)
 }
 
@@ -38,6 +40,18 @@ func ReturnAuthResponse(state bool, token string) (response []byte, err error) {
 		responseSuccessAuth.Status = "success"
 		responseSuccessAuth.Key = token
 		return json.Marshal(responseSuccessAuth)
+	} else {
+		var responseStatus ResponseStatus
+		responseStatus.Status = "error"
+		return json.Marshal(responseStatus)
+	}
+}
+
+func ReturnTasks(forums []data.Forum) (response []byte, err error) {
+	if forums == nil || len(forums) != 0 {
+		var responseForums ResponseForums
+		responseForums.Forums = forums
+		return json.Marshal(responseForums)
 	} else {
 		var responseStatus ResponseStatus
 		responseStatus.Status = "error"

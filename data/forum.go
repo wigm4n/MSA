@@ -35,25 +35,32 @@ func CreateWelcomeMessage(taskId int, userId string, taskName string) (err error
 		return
 	}
 	defer stmt.Close()
-	stmt.Query(taskId, userId, "Этот формум создан для обсуждения задания \""+taskName+"\".", time.Now())
+	stmt.Query(taskId, userId, "Этот форум создан для обсуждения задания \""+taskName+"\".", time.Now())
 	return
 }
 
 func GetForumsByUserName(ownerNameId int) (forums []Forum, err error) {
-	rows, err := db.Query("SELECT id, name, date FROM tasks WHERE creator_user_id = $1", ownerNameId)
+	rows, err := db.Query("SELECT id, name, group_id, date FROM tasks WHERE creator_user_id = $1", ownerNameId)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	for rows.Next() {
 		var task Forum
-		err = rows.Scan(&task.ID, &task.Name, &task.Date)
+		var groupId int
+		err = rows.Scan(&task.ID, &task.Name, &groupId, &task.Date)
+		groupName, err := GetGroupNameByGroupId(groupId)
+		if err != nil {
+			log.Println("GetForumsByUserName exception, err:", err)
+			return
+		}
+		task.GroupName = groupName
 		forums = append(forums, task)
 	}
 	return
 }
 
-func GetMessagesByForum(forumId int) (messages []Message) {
+func GetMessagesByForum(forumId int) (messages []Message, err error) {
 	rows, err := db.Query("SELECT user_id, text FROM messages WHERE task_id = $1 order by date asc", forumId)
 	if err != nil {
 		fmt.Println(err)
@@ -63,6 +70,10 @@ func GetMessagesByForum(forumId int) (messages []Message) {
 		var message Message
 		err = rows.Scan(&message.UserName, &message.Text)
 		messages = append(messages, message)
+	}
+	if err != nil {
+		log.Println("GetMessagesByForum exception, err:", err)
+		return
 	}
 	return
 }

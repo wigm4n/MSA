@@ -1,5 +1,5 @@
 {
-  "host": "127.0.0.1.12",
+  "host": "127.0.0.1",
   "port": 5432,
   "db_name": "msa",
   "user": "ilobanov",

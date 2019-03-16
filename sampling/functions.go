@@ -4,9 +4,9 @@ import (
 	"MSA/data"
 	"math"
 	"math/rand"
-	"os"
-	"strconv"
-	"time"
+	//"os"
+	//"strconv"
+	//"time"
 )
 
 func Round(x float64, prec int) float64 {
@@ -192,159 +192,159 @@ func Tss(seq1, seq2, seq3 []float64) (q float64) {
 }
 
 func ReturnTask1(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
-	pathHomework := "./Homeworks/Homework-1_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-1_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-1_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
-		number := strconv.Itoa(i + 1)
-		pathResults := path1 + "/Task-" + number + ".xlsx"
-		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task1(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
-			return false
-		}
-	}
+	//if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
+	//	os.Mkdir("./Homeworks", 0755)
+	//}
+	//
+	//t := time.Now()
+	//timeTask := t.Format("(02-Jan-2006,15:04)")
+	//pathHomework := "./Homeworks/Homework-1_" + timeTask
+	//os.Mkdir(pathHomework, 0755)
+	//
+	//path1 := "./Homeworks/Homework-1_" + timeTask + "/Tasks"
+	//path2 := "./Homeworks/Homework-1_" + timeTask + "/Answers"
+	//os.Mkdir(path1, 0755)
+	//os.Mkdir(path2, 0755)
+	//
+	//for i := 0; i < taskExtended.Count; i++ {
+	//	number := strconv.Itoa(i + 1)
+	//	pathResults := path1 + "/Task-" + number + ".xlsx"
+	//	pathProfData := path2 + "/Answer-" + number + ".xlsx"
+	//	if !Task1(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
+	//		return false
+	//	}
+	//}
 	return true
 }
 
 func ReturnTask2(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
-	pathHomework := "./Homeworks/Homework-2_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-2_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-2_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
-		number := strconv.Itoa(i + 1)
-		pathResults := path1 + "/Task-" + number + ".xlsx"
-		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task2(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
-			return false
-		}
-	}
+	//	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
+	//		os.Mkdir("./Homeworks", 0755)
+	//	}
+	//
+	//	t := time.Now()
+	//	timeTask := t.Format("(02-Jan-2006,15:04)")
+	//	pathHomework := "./Homeworks/Homework-2_" + timeTask
+	//	os.Mkdir(pathHomework, 0755)
+	//
+	//	path1 := "./Homeworks/Homework-2_" + timeTask + "/Tasks"
+	//	path2 := "./Homeworks/Homework-2_" + timeTask + "/Answers"
+	//	os.Mkdir(path1, 0755)
+	//	os.Mkdir(path2, 0755)
+	//
+	//	for i := 0; i < taskExtended.Count; i++ {
+	//		number := strconv.Itoa(i + 1)
+	//		pathResults := path1 + "/Task-" + number + ".xlsx"
+	//		pathProfData := path2 + "/Answer-" + number + ".xlsx"
+	//		if !Task2(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
+	//			return false
+	//		}
+	//	}
 	return true
 }
 
 func ReturnTask3(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
-	pathHomework := "./Homeworks/Homework-3_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-3_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-3_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
-		number := strconv.Itoa(i + 1)
-		pathResults := path1 + "/Task-" + number + ".xlsx"
-		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task3(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
-			return false
-		}
-	}
+	//	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
+	//		os.Mkdir("./Homeworks", 0755)
+	//	}
+	//
+	//	t := time.Now()
+	//	timeTask := t.Format("(02-Jan-2006,15:04)")
+	//	pathHomework := "./Homeworks/Homework-3_" + timeTask
+	//	os.Mkdir(pathHomework, 0755)
+	//
+	//	path1 := "./Homeworks/Homework-3_" + timeTask + "/Tasks"
+	//	path2 := "./Homeworks/Homework-3_" + timeTask + "/Answers"
+	//	os.Mkdir(path1, 0755)
+	//	os.Mkdir(path2, 0755)
+	//
+	//	for i := 0; i < taskExtended.Count; i++ {
+	//		number := strconv.Itoa(i + 1)
+	//		pathResults := path1 + "/Task-" + number + ".xlsx"
+	//		pathProfData := path2 + "/Answer-" + number + ".xlsx"
+	//		if !Task3(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
+	//			return false
+	//		}
+	//	}
 	return true
 }
 
 func ReturnTask4(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
-	pathHomework := "./Homeworks/Homework-4_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-4_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-4_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
-		number := strconv.Itoa(i + 1)
-		pathResults := path1 + "/Task-" + number + ".xlsx"
-		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task4(taskExtended.Alpha, pathResults, pathProfData) {
-			return false
-		}
-	}
+	//if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
+	//	os.Mkdir("./Homeworks", 0755)
+	//}
+	//
+	//t := time.Now()
+	//timeTask := t.Format("(02-Jan-2006,15:04)")
+	//pathHomework := "./Homeworks/Homework-4_" + timeTask
+	//os.Mkdir(pathHomework, 0755)
+	//
+	//path1 := "./Homeworks/Homework-4_" + timeTask + "/Tasks"
+	//path2 := "./Homeworks/Homework-4_" + timeTask + "/Answers"
+	//os.Mkdir(path1, 0755)
+	//os.Mkdir(path2, 0755)
+	//
+	//for i := 0; i < taskExtended.Count; i++ {
+	//	number := strconv.Itoa(i + 1)
+	//	pathResults := path1 + "/Task-" + number + ".xlsx"
+	//	pathProfData := path2 + "/Answer-" + number + ".xlsx"
+	//	if !Task4(taskExtended.Alpha, pathResults, pathProfData) {
+	//		return false
+	//	}
+	//}
 	return true
 }
 
 func ReturnTask5(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
-	pathHomework := "./Homeworks/Homework-5_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-5_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-5_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
-		number := strconv.Itoa(i + 1)
-		pathResults := path1 + "/Task-" + number + ".xlsx"
-		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task5(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
-			return false
-		}
-	}
+	//if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
+	//	os.Mkdir("./Homeworks", 0755)
+	//}
+	//
+	//t := time.Now()
+	//timeTask := t.Format("(02-Jan-2006,15:04)")
+	//pathHomework := "./Homeworks/Homework-5_" + timeTask
+	//os.Mkdir(pathHomework, 0755)
+	//
+	//path1 := "./Homeworks/Homework-5_" + timeTask + "/Tasks"
+	//path2 := "./Homeworks/Homework-5_" + timeTask + "/Answers"
+	//os.Mkdir(path1, 0755)
+	//os.Mkdir(path2, 0755)
+	//
+	//for i := 0; i < taskExtended.Count; i++ {
+	//	number := strconv.Itoa(i + 1)
+	//	pathResults := path1 + "/Task-" + number + ".xlsx"
+	//	pathProfData := path2 + "/Answer-" + number + ".xlsx"
+	//	if !Task5(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
+	//		return false
+	//	}
+	//}
 	return true
 }
 
 func ReturnTask6(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
-	pathHomework := "./Homeworks/Homework-6_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-6_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-6_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
-		number := strconv.Itoa(i + 1)
-		pathResults := path1 + "/Task-" + number + ".xlsx"
-		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task6(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.Size2,
-			taskExtended.Size3, taskExtended.ExpectedValue, taskExtended.StdDeviation,
-			taskExtended.Alpha, pathResults, pathProfData) {
-			return false
-		}
-	}
+	//if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
+	//	os.Mkdir("./Homeworks", 0755)
+	//}
+	//
+	//t := time.Now()
+	//timeTask := t.Format("(02-Jan-2006,15:04:05)")
+	//pathHomework := "./Homeworks/Homework-6_" + timeTask
+	//os.Mkdir(pathHomework, 0755)
+	//
+	//path1 := "./Homeworks/Homework-6_" + timeTask + "/Tasks"
+	//path2 := "./Homeworks/Homework-6_" + timeTask + "/Answers"
+	//os.Mkdir(path1, 0755)
+	//os.Mkdir(path2, 0755)
+	//
+	//for i := 0; i < taskExtended.Count; i++ {
+	//	number := strconv.Itoa(i + 1)
+	//	pathResults := path1 + "/Task-" + number + ".xlsx"
+	//	pathProfData := path2 + "/Answer-" + number + ".xlsx"
+	//	if !Task6(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.Size2,
+	//		taskExtended.Size3, taskExtended.ExpectedValue, taskExtended.StdDeviation,
+	//		taskExtended.Alpha, pathResults, pathProfData) {
+	//		return false
+	//	}
+	//}
 	return true
 }

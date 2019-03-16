@@ -4,7 +4,7 @@ import (
 	"MSA/data"
 	"MSA/json_responses"
 	"MSA/sampling"
-	"MSA/testing"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -21,6 +21,49 @@ const (
 	Task6 TaskType = 6
 )
 
+func GetTasksByProfessor(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		log.Fatalln("ParseForm() err:", err)
+		return
+	}
+	token := r.FormValue("token")
+	email, err := data.GetEmailByToken(token)
+	if err != nil {
+		log.Println(err, "Ошибка в email по токену")
+	}
+
+	user, err := data.GetUserByEmail(email)
+	if err != nil {
+		log.Println(err, "Ошибка в получении пользователя из базы данных")
+	}
+
+	tasks, err := data.GetForumsByUserName(user.ID)
+	if err != nil {
+		log.Println(err, "Ошибка в получении заданий для пользователя "+email)
+	}
+
+	if !(tasks == nil) {
+		response, _ := json_responses.ReturnForums(tasks)
+		w.Write(response)
+	} else {
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
+	}
+	log.Println("Process is in GetTasksByProf method")
+}
+
+func GetTasksForStudents(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		log.Fatalln("ParseForm() err:", err)
+		return
+	}
+	log.Println("Process is in GetTasksByProf method")
+
+	//groupId := r.FormValue("group_id")
+	//optionNumber := r.FormValue("option_number")
+
+}
+
 func CreateTask(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		log.Fatalln("ParseForm() err:", err)
@@ -28,45 +71,53 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Process is in CreateTask method")
 
-	if testing.IsTestModeOn() {
-		//поменять параметр на false, если хочешь вернуть ошибку
-		response, _ := json_responses.ReturnStatus(true)
-		w.Write(response)
-	} else {
-		var taskExtended data.TaskExtended
+	var taskExtended data.TaskExtended
 
-		taskExtended.Email = r.FormValue("creator_email")
-		taskExtended.Name = r.FormValue("task_name")
-		taskExtended.TaskType, _ = strconv.Atoi(r.FormValue("task_type"))
-		taskExtended.Count, _ = strconv.Atoi(r.FormValue("count"))
-		taskExtended.Alpha, _ = strconv.ParseFloat(r.FormValue("alpha"), 64)
-		taskExtended.Size, _ = strconv.Atoi(r.FormValue("size"))
-		taskExtended.Size2, _ = strconv.Atoi(r.FormValue("size_2"))
-		taskExtended.Size3, _ = strconv.Atoi(r.FormValue("size_3"))
-		taskExtended.ExpectedValue, _ = strconv.ParseFloat(r.FormValue("expected_value"), 64)
-		taskExtended.StdDeviation, _ = strconv.ParseFloat(r.FormValue("std_deviation"), 64)
-		taskExtended.DecimalPlaces, _ = strconv.Atoi(r.FormValue("decimal_places"))
+	taskExtended.Name = r.FormValue("task_name")
+	taskExtended.TaskType, _ = strconv.Atoi(r.FormValue("task_type"))
+	taskExtended.Token = r.FormValue("token")
 
-		log.Println("Read task params from user:", taskExtended)
+	mockString := "[{" +
+		"\"group_id\": 1," +
+		"\"count\": 20," +
+		"\"size\": 50," +
+		"\"size_2\": 50," +
+		"\"size_3\": 50," +
+		"\"expected_value\": 1," +
+		"\"std_deviation\": 20," +
+		"\"decimal_places\": 1},{" +
+		"\"group_id\": 2," +
+		"\"count\": 240," +
+		"\"size\": 5," +
+		"\"size_2\": 5," +
+		"\"size_3\": 5," +
+		"\"expected_value\": 1.1," +
+		"\"std_deviation\": 2.1," +
+		"\"decimal_places\": 6}]"
+	taskExtended.Name = "домашка номер 1"
 
-		taskExtended.Email = "chyps97@gmail.com"
-		taskExtended.Name = "Домашнее задание №1"
-		taskExtended.Count = 10
-		taskExtended.Alpha = 0.05
-		taskExtended.Size = 10
-		taskExtended.Size2 = 10
-		taskExtended.Size3 = 10
-		taskExtended.ExpectedValue = 0
-		taskExtended.StdDeviation = 1
-		taskExtended.DecimalPlaces = 2
-		taskExtended.TaskType = 6
+	var fields []data.TaskFields
+	//json.Unmarshal([]byte(r.FormValue("task_fields")), &fields)
+	json.Unmarshal([]byte(mockString), &fields)
+	taskExtended.TaskFieldsList = fields
 
-		//===== запись в базу данных
-		taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskType)
-		user, err := data.GetUserByEmail(taskExtended.Email)
-		if err != nil {
-			log.Println(err, "Ошибка в получении пользователя из базы данных")
-		}
+	email, err := data.GetEmailByToken(taskExtended.Token)
+	if err != nil {
+		log.Println(err, "Ошибка в получении email по токену")
+	}
+	taskExtended.Email = email
+
+	log.Println("Read task params from user:", taskExtended)
+
+	//===== запись в базу данных
+	user, err := data.GetUserByEmail(taskExtended.Email)
+	if err != nil {
+		log.Println(err, "Ошибка в получении пользователя из базы данных")
+	}
+
+	for i := 0; i < len(taskExtended.TaskFieldsList); i++ {
+		taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskFieldsList[i].GroupId,
+			taskExtended.TaskFieldsList[i].Count)
 		err = taskForDB.CreateNewTaskInDB(user.ID)
 		if err != nil {
 			log.Println(err, "Ошибка в создании задания в базе данных")
@@ -75,20 +126,22 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err, "Ошибка в создании первого собщения в базе данных")
 		}
-		//=====
-
-		status := TaskType(taskExtended.TaskType).TaskType(taskExtended)
-		log.Println("Task data generated:", status)
-
-		response, err := json_responses.ReturnStatus(status)
-		//response, err := json_responses.ReturnStatus(true)
-
-		if err = r.ParseForm(); err != nil {
-			log.Fatalln("Error in the formation of a response from the server... Error is:", err)
-			return
-		}
-		w.Write(response)
 	}
+	//=====
+
+	//ГЕНЕРАЦИЯ ЗАДАНИЙ ВКЛЮЧЕНА
+	//status := TaskType(taskExtended.TaskType).TaskType(taskExtended)
+	//log.Println("Task data generated:", status)
+	//response, err := json_responses.ReturnStatus(status)
+
+	//ГЕНЕРАЦИЯ ЗАДАНИЙ ВЫКЛЮЧЕНА
+	response, err := json_responses.ReturnStatus(true)
+
+	if err = r.ParseForm(); err != nil {
+		log.Fatalln("Error in the formation of a response from the server... Error is:", err)
+		return
+	}
+	w.Write(response)
 }
 
 func (task TaskType) TaskType(taskExtended data.TaskExtended) bool {

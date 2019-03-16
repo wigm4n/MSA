@@ -1,6 +1,7 @@
 package data
 
 import (
+	"TS/data"
 	"log"
 )
 
@@ -38,9 +39,10 @@ func IsExist(email string) (exists bool, err error) {
 
 //проверка аутентификационных данных пользователя
 func IsUserValid(email string, password string) (exists bool) {
+	log.Println("in IsUserValid method")
 	user, err := GetUserByEmail(email)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("in IsUserValid err log:", err)
 		return false
 	}
 	if user.Password == Encrypt(password) {
@@ -51,10 +53,28 @@ func IsUserValid(email string, password string) (exists bool) {
 
 //получение пользователя по email
 func GetUserByEmail(email string) (user User, err error) {
+	log.Println("in GetUserByEmail method")
 	err = db.QueryRow("SELECT id, email, firstname, lastname, password FROM users WHERE email = $1", email).
 		Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.Password)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("in GetUserByEmail exception:", err)
+		return
+	}
+	return
+}
+
+func GetEmailByToken(token string) (email string, err error) {
+	var session data.Session
+	err = db.QueryRow("SELECT id, user_id FROM sessions WHERE token = $1", token).
+		Scan(&session.Id, &session.UserId)
+	if err != nil {
+		log.Println("GetEmailByToken exception, cannot get session:", err)
+		return
+	}
+	err = db.QueryRow("SELECT email FROM users WHERE id = $1", session.UserId).
+		Scan(&email)
+	if err != nil {
+		log.Println("GetUserByEmail exception, cannot get email:", err)
 		return
 	}
 	return
