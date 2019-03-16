@@ -26,6 +26,12 @@ func GetRand(min, max int) int {
 	return min + int(rand.Float64()*float64((max-min)+1))
 }
 
+func ReturnAlpha() float64 {
+	alpha := []float64{0.05, 0.02, 0.01, 0.1}
+	x := GetRand(0, len(alpha)-1)
+	return alpha[x]
+}
+
 // Генерация чисел
 func GenerateSeq(expectedValue, stdDeviation float64, decimalPlaces, n int) (seq []float64) {
 	for i := 0; i < n; i++ {
@@ -155,12 +161,12 @@ func F(seq1, seq2, seq3 []float64) float64 {
 
 // Значение левой границы
 func LeftTboard(seq []float64, tcrit float64) float64 {
-	return Average(seq) - tcrit*Variance(seq)/math.Sqrt(float64(len(seq)))
+	return Round(Average(seq)-tcrit*Variance(seq)/math.Sqrt(float64(len(seq))), 2)
 }
 
 // Значение правой границы
 func RightTboard(seq []float64, tcrit float64) float64 {
-	return Average(seq) + tcrit*Variance(seq)/math.Sqrt(float64(len(seq)))
+	return Round(Average(seq)+tcrit*Variance(seq)/math.Sqrt(float64(len(seq))), 2)
 }
 
 // Рассчёт t-статистики
@@ -173,11 +179,10 @@ func ZStatistic(seq1, seq2 []float64) float64 {
 	return (Average(seq1) - Average(seq2)) / math.Sqrt(Variance(seq1)/float64(len(seq1))+Variance(seq2)/float64(len(seq2)))
 }
 
-func ZStatistic2(n1, n2, m1, m2 int) float64 {
-	p1 := float64(m1) / float64(n1)
-	p2 := float64(m2) / float64(n2)
-	p := float64(m1 + m2/n1 + n2)
-	return p1 - p2/math.Sqrt(p*(1-p)*(float64(1)/float64(n1)+float64(1)/float64(n2)))
+func ZStatistic2(n1, n2, m1, m2 int, p1, p2 float64) float64 {
+	p := Round(float64(m1+m2)/float64(n1+n2), 2)
+	a := math.Sqrt(p * (1 - p) * (float64(1)/float64(n1) + float64(1)/float64(n2)))
+	return Round((p1-p2)/a, 2)
 }
 
 func Tss(seq1, seq2, seq3 []float64) (q float64) {
@@ -197,7 +202,7 @@ func ReturnTask1(taskExtended data.TaskExtended) bool {
 	}
 
 	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
+	timeTask := t.Format("(02-Jan-2006_15:04:05)")
 	pathHomework := "./Homeworks/Homework-1_" + timeTask
 	os.Mkdir(pathHomework, 0755)
 
@@ -210,7 +215,7 @@ func ReturnTask1(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task1(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
+		if !Task1(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
 			return false
 		}
 	}
@@ -223,7 +228,7 @@ func ReturnTask2(taskExtended data.TaskExtended) bool {
 	}
 
 	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
+	timeTask := t.Format("(02-Jan-2006_15:04:05)")
 	pathHomework := "./Homeworks/Homework-2_" + timeTask
 	os.Mkdir(pathHomework, 0755)
 
@@ -236,7 +241,7 @@ func ReturnTask2(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task2(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
+		if !Task2(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
 			return false
 		}
 	}
@@ -249,7 +254,7 @@ func ReturnTask3(taskExtended data.TaskExtended) bool {
 	}
 
 	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
+	timeTask := t.Format("(02-Jan-2006_15:04:05)")
 	pathHomework := "./Homeworks/Homework-3_" + timeTask
 	os.Mkdir(pathHomework, 0755)
 
@@ -262,7 +267,7 @@ func ReturnTask3(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task3(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
+		if !Task3(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
 			return false
 		}
 	}
@@ -275,7 +280,7 @@ func ReturnTask4(taskExtended data.TaskExtended) bool {
 	}
 
 	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
+	timeTask := t.Format("(02-Jan-2006_15:04:05)")
 	pathHomework := "./Homeworks/Homework-4_" + timeTask
 	os.Mkdir(pathHomework, 0755)
 
@@ -288,7 +293,7 @@ func ReturnTask4(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task4(taskExtended.Alpha, pathResults, pathProfData) {
+		if !Task4(pathResults, pathProfData) {
 			return false
 		}
 	}
@@ -301,7 +306,7 @@ func ReturnTask5(taskExtended data.TaskExtended) bool {
 	}
 
 	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
+	timeTask := t.Format("(02-Jan-2006_15:04:05)")
 	pathHomework := "./Homeworks/Homework-5_" + timeTask
 	os.Mkdir(pathHomework, 0755)
 
@@ -314,7 +319,7 @@ func ReturnTask5(taskExtended data.TaskExtended) bool {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task5(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, taskExtended.Alpha, pathResults, pathProfData) {
+		if !Task5(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
 			return false
 		}
 	}
@@ -327,7 +332,7 @@ func ReturnTask6(taskExtended data.TaskExtended) bool {
 	}
 
 	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006,15:04)")
+	timeTask := t.Format("(02-Jan-2006_15:04:05)")
 	pathHomework := "./Homeworks/Homework-6_" + timeTask
 	os.Mkdir(pathHomework, 0755)
 
@@ -341,8 +346,7 @@ func ReturnTask6(taskExtended data.TaskExtended) bool {
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
 		if !Task6(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.Size2,
-			taskExtended.Size3, taskExtended.ExpectedValue, taskExtended.StdDeviation,
-			taskExtended.Alpha, pathResults, pathProfData) {
+			taskExtended.Size3, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
 			return false
 		}
 	}
