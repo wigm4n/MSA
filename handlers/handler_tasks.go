@@ -96,22 +96,23 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	mockString := "[{" +
 		"\"group_id\": 1," +
-		"\"count\": 20," +
-		"\"size\": 50," +
-		"\"size_2\": 50," +
-		"\"size_3\": 50," +
-		"\"expected_value\": 1," +
+		"\"count\": 10," +
+		"\"size\": 15," +
+		"\"size_2\": 15," +
+		"\"size_3\": 15," +
+		"\"expected_value\": -7.8," +
 		"\"std_deviation\": 20," +
-		"\"decimal_places\": 1},{" +
+		"\"decimal_places\": 2},{" +
 		"\"group_id\": 2," +
-		"\"count\": 240," +
-		"\"size\": 5," +
-		"\"size_2\": 5," +
-		"\"size_3\": 5," +
-		"\"expected_value\": 1.1," +
+		"\"count\": 10," +
+		"\"size\": 8," +
+		"\"size_2\": 8," +
+		"\"size_3\": 8," +
+		"\"expected_value\": 80," +
 		"\"std_deviation\": 2.1," +
-		"\"decimal_places\": 6}]"
+		"\"decimal_places\": 4}]"
 	taskExtended.Name = "домашка номер 1"
+	taskExtended.TaskType = 6
 
 	var fields []data.TaskFields
 	//json.Unmarshal([]byte(r.FormValue("task_fields")), &fields)
@@ -127,14 +128,14 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	log.Println("Read task params from user:", taskExtended)
 
 	//===== запись в базу данных
-	//user, err := data.GetUserByEmail(taskExtended.Email)
+	user, err := data.GetUserByEmail(taskExtended.Email)
 	if err != nil {
 		log.Println(err, "Ошибка в получении пользователя из базы данных")
 	}
 
 	var status bool
 	for i := 0; i < len(taskExtended.TaskFieldsList); i++ {
-		/*taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskFieldsList[i].GroupId,
+		taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskFieldsList[i].GroupId,
 			taskExtended.TaskFieldsList[i].Count)
 		err = taskForDB.CreateNewTaskInDB(user.ID)
 		if err != nil {
@@ -143,10 +144,16 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		data.CreateWelcomeMessage(taskForDB.ID, taskExtended.Email, taskExtended.Name)
 		if err != nil {
 			log.Println(err, "Ошибка в создании первого собщения в базе данных")
-		}*/
+		}
 
 		//ГЕНЕРАЦИЯ ЗАДАНИЙ ВКЛЮЧЕНА
-		status = TaskType(taskExtended.TaskType).TaskType(taskExtended.TaskFieldsList[i])
+		groupName, err := data.GetGroupNameByGroupId(taskExtended.TaskFieldsList[i].GroupId)
+		if err != nil {
+			log.Println(err, "Ошибка в получении имени группы по id", err)
+		}
+		status, _, _ = TaskType(taskExtended.TaskType).TaskType(taskExtended.TaskFieldsList[i], i, groupName)
+		//status, path1, path2 :=
+		//TODO: продумать хранение путей к файлам и запись в базу
 		if !status {
 			log.Println("Ошибка в генерации данных")
 			response, _ := json_responses.ReturnStatus(status)
@@ -170,21 +177,21 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 }
 
-func (task TaskType) TaskType(taskExtended data.TaskFields) bool {
+func (task TaskType) TaskType(taskExtended data.TaskFields, i int, groupName string) (bool, string, string) {
 	switch task {
 	case Task1:
-		return sampling.ReturnTask1(taskExtended)
+		return sampling.ReturnTask1(taskExtended, i, groupName)
 	case Task2:
-		return sampling.ReturnTask2(taskExtended)
+		return sampling.ReturnTask2(taskExtended, i, groupName)
 	case Task3:
-		return sampling.ReturnTask3(taskExtended)
+		return sampling.ReturnTask3(taskExtended, i, groupName)
 	case Task4:
-		return sampling.ReturnTask4(taskExtended)
+		return sampling.ReturnTask4(taskExtended, i, groupName)
 	case Task5:
-		return sampling.ReturnTask5(taskExtended)
+		return sampling.ReturnTask5(taskExtended, i, groupName)
 	case Task6:
-		return sampling.ReturnTask6(taskExtended)
+		return sampling.ReturnTask6(taskExtended, i, groupName)
 	default:
-		return false
+		return false, "", ""
 	}
 }

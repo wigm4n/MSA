@@ -176,7 +176,7 @@ func TStatistic(seq []float64, a0 float64) float64 {
 
 // Рассчёт z-статистики
 func ZStatistic(seq1, seq2 []float64) float64 {
-	return (Average(seq1) - Average(seq2)) / math.Sqrt(Variance(seq1)/float64(len(seq1))+Variance(seq2)/float64(len(seq2)))
+	return Round((Average(seq1)-Average(seq2))/math.Sqrt(Variance(seq1)/float64(len(seq1))+Variance(seq2)/float64(len(seq2))), 2)
 }
 
 func ZStatistic2(n1, n2, m1, m2 int, p1, p2 float64) float64 {
@@ -202,7 +202,7 @@ func createDirectories(i int, name string) (path1, path2 string) {
 	}
 
 	t := time.Now()
-	timeTask := t.Format("(_02-Jan-2006-15-04-05_)")
+	timeTask := t.Format("_02-Jan-2006-15-04-05_")
 	pathHomework := "./Homeworks/" + name + timeTask + strconv.Itoa(i+1)
 	os.Mkdir(pathHomework, 0755)
 

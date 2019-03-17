@@ -163,8 +163,8 @@ func Task3(decimalPlaces, n int, expectedValue, stdDeviation float64, pathResult
 	seq2 := GenerateSeq(expectedValue, stdDeviation, decimalPlaces, n)
 	m1 := Average(seq1)
 	m2 := Average(seq2)
-	Sigma1 := math.Sqrt(Variance(seq1)) * MAGIC_COEF
-	Sigma2 := math.Sqrt(Variance(seq2)) * MAGIC_COEF
+	Sigma1 := Round(math.Sqrt(Variance(seq1))*MAGIC_COEF, 2)
+	Sigma2 := Round(math.Sqrt(Variance(seq2))*MAGIC_COEF, 2)
 	ZStatisticVal := ZStatistic(seq1, seq2)
 	ucrit1 := GetNorm(1 - alpha)
 	ucrit2 := GetNorm(1-alpha) / 2
