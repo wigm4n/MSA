@@ -1,7 +1,6 @@
 package data
 
 import (
-	"TS/data"
 	"log"
 )
 

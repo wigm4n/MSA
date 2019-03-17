@@ -110,13 +110,14 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	log.Println("Read task params from user:", taskExtended)
 
 	//===== запись в базу данных
-	user, err := data.GetUserByEmail(taskExtended.Email)
+	//user, err := data.GetUserByEmail(taskExtended.Email)
 	if err != nil {
 		log.Println(err, "Ошибка в получении пользователя из базы данных")
 	}
 
+	var status bool
 	for i := 0; i < len(taskExtended.TaskFieldsList); i++ {
-		taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskFieldsList[i].GroupId,
+		/*taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskFieldsList[i].GroupId,
 			taskExtended.TaskFieldsList[i].Count)
 		err = taskForDB.CreateNewTaskInDB(user.ID)
 		if err != nil {
@@ -125,17 +126,25 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		data.CreateWelcomeMessage(taskForDB.ID, taskExtended.Email, taskExtended.Name)
 		if err != nil {
 			log.Println(err, "Ошибка в создании первого собщения в базе данных")
+		}*/
+
+		//ГЕНЕРАЦИЯ ЗАДАНИЙ ВКЛЮЧЕНА
+		status = TaskType(taskExtended.TaskType).TaskType(taskExtended.TaskFieldsList[i])
+		if !status {
+			log.Println("Ошибка в генерации данных")
+			response, _ := json_responses.ReturnStatus(status)
+			w.Write(response)
+			return
 		}
+		log.Println("Task data generated:", status)
+
 	}
 	//=====
 
-	//ГЕНЕРАЦИЯ ЗАДАНИЙ ВКЛЮЧЕНА
-	//status := TaskType(taskExtended.TaskType).TaskType(taskExtended)
-	//log.Println("Task data generated:", status)
-	//response, err := json_responses.ReturnStatus(status)
+	response, err := json_responses.ReturnStatus(status)
 
 	//ГЕНЕРАЦИЯ ЗАДАНИЙ ВЫКЛЮЧЕНА
-	response, err := json_responses.ReturnStatus(true)
+	//response, err := json_responses.ReturnStatus(true)
 
 	if err = r.ParseForm(); err != nil {
 		log.Fatalln("Error in the formation of a response from the server... Error is:", err)
@@ -144,7 +153,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 }
 
-func (task TaskType) TaskType(taskExtended data.TaskExtended) bool {
+func (task TaskType) TaskType(taskExtended data.TaskFields) bool {
 	switch task {
 	case Task1:
 		return sampling.ReturnTask1(taskExtended)
