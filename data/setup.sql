@@ -2,26 +2,34 @@ drop table users cascade ;
 drop table tasks cascade ;
 drop table messages cascade ;
 drop table sessions cascade ;
+drop table groups cascade ;
 
 create table users (
-  id          serial not null primary key,
-  email       varchar(64),
-  firstname   varchar(255),
-  lastname    varchar(255),
-  password    text
+  id                serial not null primary key,
+  email             varchar(64),
+  firstname         varchar(255),
+  lastname          varchar(255),
+  password          text
+);
+
+create table groups (
+  id                serial not null primary key,
+  creator_user_id   integer references users(id),
+  name              varchar(255)
 );
 
 create table tasks (
-  id                serial not null primary key ,
+  id                serial not null primary key,
   creator_user_id   integer references users(id),
   name              varchar(255),
-  task_type         int,
+  group_id          integer references groups(id),
+  option_count      int,
   date              timestamp
 );
 
 create table messages (
   id                serial not null primary key,
-  task_id           integer references tasks(id),
+  task_id          integer references tasks(id),
   user_id           varchar(255),
   text              text,
   date              timestamp
@@ -33,7 +41,10 @@ create table sessions (
   token             varchar(255)
 );
 
-insert into users (email, firstname, lastname, password) values ('chyps97@gmail.com', 'Илья', 'Лобанов', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
+insert into users (email, firstname, lastname, password) values ('test', 'Александр', 'Крупняк', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
+insert into groups (creator_user_id, name) values (1, 'БПИ151');
+insert into groups (creator_user_id, name) values (1, 'БПИ152');
+insert into groups (creator_user_id, name) values (1, 'БПИ153');
 
 
 insert into users (email, firstname, lastname, password) values ('test3@hse.ru', 'prep', 'prepov', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
