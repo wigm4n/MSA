@@ -1,14 +1,20 @@
 package auth
 
 import (
+	"crypto/rand"
 	"github.com/gin-gonic/gin"
-	"math/rand"
+	"math/big"
 	"net/http"
-	"strconv"
 )
 
-func GenerateSessionToken() string {
-	return strconv.FormatInt(rand.Int63(), 16)
+func GenerateSessionToken() (password string) {
+	bytes := make([]byte, 16)
+	for i := 0; i < 16; i++ {
+		nBig, _ := rand.Int(rand.Reader, big.NewInt(25))
+		bytes[i] = byte(65 + nBig.Int64())
+	}
+	password = string(bytes)
+	return
 }
 
 func EnsureLoggedIn() gin.HandlerFunc {
