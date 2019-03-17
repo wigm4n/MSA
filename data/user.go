@@ -1,28 +1,28 @@
 package data
 
 import (
-	"TS/data"
 	"log"
 )
 
 type User struct {
-	ID        int
-	Email     string `json:"email"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Password  string `json:"password"`
+	ID         int
+	Email      string `json:"email"`
+	FirstName  string `json:"firstName"`
+	LastName   string `json:"lastName"`
+	Patronymic string `json:"patronymic"`
+	Password   string `json:"password"`
 }
 
 //регистрация нового пользователя
 func (user *User) RegisterNewUser() (err error) {
-	statement := "INSERT INTO users (email, firstName, lastName, password) VALUES ($1, $2, $3, $4) RETURNING id"
+	statement := "INSERT INTO users (email, firstName, lastName, patronymic, password) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer stmt.Close()
-	err = stmt.QueryRow(user.Email, user.FirstName, user.LastName, Encrypt(user.Password)).Scan(&user.ID)
+	err = stmt.QueryRow(user.Email, user.FirstName, user.LastName, user.Patronymic, Encrypt(user.Password)).Scan(&user.ID)
 	return
 }
 
@@ -64,14 +64,14 @@ func GetUserByEmail(email string) (user User, err error) {
 }
 
 func GetEmailByToken(token string) (email string, err error) {
-	var session data.Session
-	err = db.QueryRow("SELECT id, user_id FROM sessions WHERE token = $1", token).
-		Scan(&session.Id, &session.UserId)
+	var userId int
+	err = db.QueryRow("SELECT user_id FROM sessions WHERE token = $1", token).
+		Scan(&userId)
 	if err != nil {
 		log.Println("GetEmailByToken exception, cannot get session:", err)
 		return
 	}
-	err = db.QueryRow("SELECT email FROM users WHERE id = $1", session.UserId).
+	err = db.QueryRow("SELECT email FROM users WHERE id = $1", userId).
 		Scan(&email)
 	if err != nil {
 		log.Println("GetUserByEmail exception, cannot get email:", err)

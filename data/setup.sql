@@ -9,6 +9,7 @@ create table users (
   email             varchar(64),
   firstname         varchar(255),
   lastname          varchar(255),
+  patronymic        varchar(255),
   password          text
 );
 
@@ -41,7 +42,8 @@ create table sessions (
   token             varchar(255)
 );
 
-insert into users (email, firstname, lastname, password) values ('test', 'Александр', 'Крупняк', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
+insert into users (email, firstname, lastname, patronymic, password) values ('test', 'Александр', 'Крупняк', 'asd', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
+insert into users (email, firstname, lastname, patronymic, password) values ('chyps97@gmail.com', 'Александр', 'Крупняк', 'sad', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
 insert into groups (creator_user_id, name) values (1, 'БПИ151');
 insert into groups (creator_user_id, name) values (1, 'БПИ152');
 insert into groups (creator_user_id, name) values (1, 'БПИ153');

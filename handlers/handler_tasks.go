@@ -26,11 +26,14 @@ func GetTasksByProfessor(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln("ParseForm() err:", err)
 		return
 	}
+	log.Println("Process is in GetTasksByProf method")
 	token := r.FormValue("token")
 	email, err := data.GetEmailByToken(token)
 	if err != nil {
 		log.Println(err, "Ошибка в email по токену")
 	}
+
+	email = "test"
 
 	user, err := data.GetUserByEmail(email)
 	if err != nil {
@@ -43,13 +46,12 @@ func GetTasksByProfessor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !(tasks == nil) {
-		response, _ := json_responses.ReturnForums(tasks)
+		response, _ := json_responses.ReturnTasks(tasks)
 		w.Write(response)
 	} else {
 		response, _ := json_responses.ReturnStatus(false)
 		w.Write(response)
 	}
-	log.Println("Process is in GetTasksByProf method")
 }
 
 func GetTasksForStudents(w http.ResponseWriter, r *http.Request) {
@@ -57,11 +59,26 @@ func GetTasksForStudents(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln("ParseForm() err:", err)
 		return
 	}
-	log.Println("Process is in GetTasksByProf method")
+	log.Println("Process is in GetTasksForStudents method")
 
-	//groupId := r.FormValue("group_id")
-	//optionNumber := r.FormValue("option_number")
+	groupId, _ := strconv.Atoi(r.FormValue("group_id"))
+	optionNumber := r.FormValue("option_number")
+	log.Println(optionNumber)
 
+	groupId = 1
+
+	tasks, err := data.GetForumsByGroup(groupId)
+	if err != nil {
+		log.Println(err, "Ошибка в получении заданий для пользователя ")
+	}
+
+	if !(tasks == nil) {
+		response, _ := json_responses.ReturnTasks(tasks)
+		w.Write(response)
+	} else {
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
+	}
 }
 
 func CreateTask(w http.ResponseWriter, r *http.Request) {

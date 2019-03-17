@@ -70,13 +70,14 @@ func SendMessage(w http.ResponseWriter, r *http.Request) {
 	text := r.FormValue("text")
 	id, _ := strconv.Atoi(r.FormValue("id"))
 
-	//userName = "TESTING_USER"
-	//text = "LOCAL_TEST_TEXT_IN_4_TASK"
-	//id = 4
-
-	message := data.Message{UserName: userName, Text: text}
-	message.CreateNewMessage(id)
-
-	response, _ := json_responses.ReturnStatus(true)
-	w.Write(response)
+	message := data.Message{TaskId: id, UserName: userName, Text: text}
+	err := message.CreateNewMessage()
+	if err != nil {
+		log.Println(err, "Ошибка в отправки сообщения")
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
+	} else {
+		response, _ := json_responses.ReturnStatus(true)
+		w.Write(response)
+	}
 }

@@ -25,7 +25,7 @@ func init() {
 	return
 }
 
-func SendEmail(email string, newPassword string) (exists bool) {
+func ResetPasswordEmail(email string, newPassword string) (exists bool) {
 	m := gomail.NewMessage()
 	m.SetHeader("From", credentials.Email)
 	m.SetHeader("To", email)
@@ -33,7 +33,29 @@ func SendEmail(email string, newPassword string) (exists bool) {
 	m.SetBody("text/html", "Доброго времени дня, "+email+"!"+
 		"<p>Вы запросили восстановление пароля."+
 		"<p>Теперь ваш новый пароль:<b>  "+newPassword+"</b>"+
-		"<p>Всего хорошего,<br>Ваш сервис восстановления паролей MSA.")
+		"<p>Всего хорошего,<br>Ваш сервис восстановления паролей портала MSA.")
+
+	d := gomail.NewDialer("smtp.gmail.com", 587, credentials.Email, credentials.Password)
+
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+		return false
+	}
+	return true
+}
+
+func CreateNewUserEmail(user User) (exists bool) {
+	m := gomail.NewMessage()
+	m.SetHeader("From", credentials.Email)
+	m.SetHeader("To", user.Email)
+	m.SetHeader("Subject", "Регистрация на сервисе hse-twims.ru")
+	m.SetBody("text/html", "Доброго времени дня, "+user.LastName+" "+user.FirstName+
+		" "+user.Patronymic+"!"+
+		"<p>Вы зарегистрированны на портале "+"<a href=\"http://www.yandex.ru\">yandex.ru</a>.</p>"+
+		"<p>Ваш логин:<b>  "+user.Email+"</b>"+
+		"<br>Ваш пароль:<b>  "+user.Password+"</b>"+
+		"<p><p>Пароль возможно сменить в настройках личного кабинета на портале."+
+		"<p>Всего хорошего,<br>Ваш сервис регистрации портала MSA.")
 
 	d := gomail.NewDialer("smtp.gmail.com", 587, credentials.Email, credentials.Password)
 

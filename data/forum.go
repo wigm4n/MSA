@@ -7,6 +7,7 @@ import (
 )
 
 type Message struct {
+	TaskId   int    `json:"id"`
 	UserName string `json:"username"`
 	Text     string `json:"text"`
 }
@@ -15,15 +16,15 @@ type Forums struct {
 	Forums []Task `json:"tasks"`
 }
 
-func (message *Message) CreateNewMessage(taskId int) {
-	statement := "INSERT INTO messages (task_id, user_id, text, date) VALUES ($1, $2, $3, $4) RETURNING id"
+func (message *Message) CreateNewMessage() (err error) {
+	statement := "INSERT INTO messages (task_id, user_id, text, date) VALUES ($1, $2, $3, $4)"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer stmt.Close()
-	stmt.Query(taskId, message.UserName, message.Text, time.Now())
+	stmt.Query(message.TaskId, message.UserName, message.Text, time.Now())
 	return
 }
 
@@ -52,8 +53,23 @@ func GetForumsByUserName(ownerNameId int) (forums []Forum, err error) {
 		groupName, err := GetGroupNameByGroupId(groupId)
 		if err != nil {
 			log.Println("GetForumsByUserName exception, err:", err)
-			return
 		}
+		task.GroupName = groupName
+		forums = append(forums, task)
+	}
+	return
+}
+
+func GetForumsByGroup(groupId int) (forums []Forum, err error) {
+	rows, err := db.Query("SELECT id, name, date FROM tasks WHERE group_id = $1", groupId)
+	if err != nil {
+		log.Println("GetForumsByGroup exception, err:", err)
+		return
+	}
+	for rows.Next() {
+		var task Forum
+		err = rows.Scan(&task.ID, &task.Name, &task.Date)
+		groupName, _ := GetGroupNameByGroupId(groupId)
 		task.GroupName = groupName
 		forums = append(forums, task)
 	}

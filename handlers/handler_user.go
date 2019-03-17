@@ -17,9 +17,9 @@ func Registration(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	firstName := r.FormValue("firstname")
 	lastName := r.FormValue("lastname")
-	//добавить patronymic как отчество
+	patronymic := r.FormValue("patronymic")
 
-	newUser := data.User{Email: email, FirstName: firstName, LastName: lastName}
+	newUser := data.User{Email: email, FirstName: firstName, LastName: lastName, Patronymic: patronymic}
 
 	isAllCorrect, err := data.IsExist(email)
 	if err != nil {
@@ -30,7 +30,13 @@ func Registration(w http.ResponseWriter, r *http.Request) {
 	if isAllCorrect == true {
 		newUser.Password = data.GenerateNewPassword()
 		if err := newUser.RegisterNewUser(); err == nil {
-			response, _ := json_responses.ReturnStatus(true)
+			res := data.CreateNewUserEmail(newUser)
+			var response []byte
+			if res {
+				response, _ = json_responses.ReturnStatus(true)
+			} else {
+				response, _ = json_responses.ReturnStatus(false)
+			}
 			w.Write(response)
 		} else {
 			response, _ := json_responses.ReturnStatus(false)
@@ -51,8 +57,6 @@ func PerformLogin(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	token := auth.GenerateSessionToken()
 
-	//email = "chyps97@gmail.com"
-	//password = "1234"
 	if data.IsUserValid(email, password) {
 		user, err := data.GetUserByEmail(email)
 		if err != nil {
@@ -68,13 +72,14 @@ func PerformLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ResetPassword(w http.ResponseWriter, r *http.Request) {
+func ResetPasswordToken(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		log.Fatalln("ParseForm() err:", err)
 		return
 	}
-	email := r.FormValue("email")
-	//email = "chyps97@gmail.com"
+	token := r.FormValue("token")
+
+	email, _ := data.GetEmailByToken(token)
 
 	isExist, err := data.IsExist(email)
 	if err != nil {
@@ -85,7 +90,36 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
 		newPassword := data.GenerateNewPassword()
 		resp := data.UpdatePassword(email, data.Encrypt(newPassword))
 		if resp {
-			response, _ := json_responses.ReturnStatus(data.SendEmail(email, newPassword))
+			response, _ := json_responses.ReturnStatus(data.ResetPasswordEmail(email, newPassword))
+			w.Write(response)
+		} else {
+			response, _ := json_responses.ReturnStatus(false)
+			w.Write(response)
+		}
+	} else {
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
+	}
+}
+
+func ResetPasswordEmail(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		log.Fatalln("ParseForm() err:", err)
+		return
+	}
+	email := r.FormValue("email")
+	email = "chyps97@gmail.com"
+
+	isExist, err := data.IsExist(email)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	if !isExist {
+		newPassword := data.GenerateNewPassword()
+		resp := data.UpdatePassword(email, data.Encrypt(newPassword))
+		if resp {
+			response, _ := json_responses.ReturnStatus(data.ResetPasswordEmail(email, newPassword))
 			w.Write(response)
 		} else {
 			response, _ := json_responses.ReturnStatus(false)

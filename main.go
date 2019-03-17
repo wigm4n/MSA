@@ -26,29 +26,27 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("assets")))
 	initRoutes()
-	port := "8888"
+	port := "8080"
 	log.Println("Listening port " + port + "...")
 	http.ListenAndServe(":"+port, nil)
 }
 
 func initRoutes() {
-	http.HandleFunc("/auth", handlers.PerformLogin)
-	http.HandleFunc("/reset_password", handlers.ResetPassword)
-	http.HandleFunc("/create_task", handlers.CreateTask)
-	http.HandleFunc("/tasks_prof", handlers.GetTasksByProfessor)
-	http.HandleFunc("/tasks_student", handlers.GetTasksForStudents)
-	http.HandleFunc("/forums", handlers.GetForums)
-	http.HandleFunc("/forum", handlers.GetForum)
-	http.HandleFunc("/send_message", handlers.SendMessage)
-	http.HandleFunc("/registration", handlers.Registration)
-	http.HandleFunc("/check_session", handlers.CheckSession)
-	//getTasks
-	//getTask
-	//deleteTask
-	//getGroups
-	//addGroup
-	//download_file
-	//изменить createtask на получение листов заданий
+	http.HandleFunc("/auth", handlers.PerformLogin)                       //OK
+	http.HandleFunc("/reset_password_token", handlers.ResetPasswordToken) //OK
+	http.HandleFunc("/reset_password_email", handlers.ResetPasswordEmail) //OK
+	http.HandleFunc("/create_task", handlers.CreateTask)                  //OK
+	http.HandleFunc("/tasks_prof", handlers.GetTasksByProfessor)          //OK
+	http.HandleFunc("/tasks_student", handlers.GetTasksForStudents)       //OK
+	http.HandleFunc("/forums", handlers.GetForums)                        //OK
+	http.HandleFunc("/forum", handlers.GetForum)                          //OK
+	http.HandleFunc("/send_message", handlers.SendMessage)                //OK
+	http.HandleFunc("/registration", handlers.Registration)               //OK
+	http.HandleFunc("/check_session", handlers.CheckSession)              //OK
+	http.HandleFunc("/groups", handlers.GetGroups)                        //OK
+	http.HandleFunc("/add_group", handlers.AddGroup)                      //OK
+	http.HandleFunc("/delete_group", handlers.DeleteGroup)                //OK
 
-	//КАК ВЫДАВАТЬ СПИСОК ФОРУМОВ ДЛЯ СТУДЕНТА?
+	//deleteTask
+	//download_file
 }
