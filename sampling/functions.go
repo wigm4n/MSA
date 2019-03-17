@@ -196,159 +196,99 @@ func Tss(seq1, seq2, seq3 []float64) (q float64) {
 	return Round(q, 2)
 }
 
-func ReturnTask1(taskExtended data.TaskExtended) bool {
+func createDirectories(i int, name string) (path1, path2 string) {
 	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
 		os.Mkdir("./Homeworks", 0755)
 	}
 
 	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006_15:04:05)")
-	pathHomework := "./Homeworks/Homework-1_" + timeTask
+	timeTask := t.Format("(_02-Jan-2006-15-04-05_)")
+	pathHomework := "./Homeworks/" + name + timeTask + strconv.Itoa(i+1)
 	os.Mkdir(pathHomework, 0755)
 
-	path1 := "./Homeworks/Homework-1_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-1_" + timeTask + "/Answers"
+	path1 = pathHomework + "/Tasks"
+	path2 = pathHomework + "/Answers"
 	os.Mkdir(path1, 0755)
 	os.Mkdir(path2, 0755)
 
-	for i := 0; i < taskExtended.Count; i++ {
+	return path1, path2
+}
+
+func ReturnTask1(taskFields data.TaskFields, i int, name string) (bool, string, string) {
+	path1, path2 := createDirectories(i, name)
+	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task1(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
-			return false
+		if !Task1(taskFields.DecimalPlaces, taskFields.Size, taskFields.ExpectedValue, taskFields.StdDeviation, pathResults, pathProfData) {
+			return false, "", ""
 		}
 	}
-	return true
+	return true, path1, path2
 }
 
-func ReturnTask2(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006_15:04:05)")
-	pathHomework := "./Homeworks/Homework-2_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-2_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-2_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
+func ReturnTask2(taskFields data.TaskFields, i int, name string) (bool, string, string) {
+	path1, path2 := createDirectories(i, name)
+	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task2(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
-			return false
+		if !Task2(taskFields.DecimalPlaces, taskFields.Size, taskFields.ExpectedValue, taskFields.StdDeviation, pathResults, pathProfData) {
+			return false, "", ""
 		}
 	}
-	return true
+	return true, path1, path2
 }
 
-func ReturnTask3(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006_15:04:05)")
-	pathHomework := "./Homeworks/Homework-3_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-3_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-3_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
+func ReturnTask3(taskFields data.TaskFields, i int, name string) (bool, string, string) {
+	path1, path2 := createDirectories(i, name)
+	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task3(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
-			return false
+		if !Task3(taskFields.DecimalPlaces, taskFields.Size, taskFields.ExpectedValue, taskFields.StdDeviation, pathResults, pathProfData) {
+			return false, "", ""
 		}
 	}
-	return true
+	return true, path1, path2
 }
 
-func ReturnTask4(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006_15:04:05)")
-	pathHomework := "./Homeworks/Homework-4_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-4_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-4_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
+func ReturnTask4(taskFields data.TaskFields, i int, name string) (bool, string, string) {
+	path1, path2 := createDirectories(i, name)
+	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
 		if !Task4(pathResults, pathProfData) {
-			return false
+			return false, "", ""
 		}
 	}
-	return true
+	return true, path1, path2
 }
 
-func ReturnTask5(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006_15:04:05)")
-	pathHomework := "./Homeworks/Homework-5_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-5_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-5_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
-	for i := 0; i < taskExtended.Count; i++ {
+func ReturnTask5(taskFields data.TaskFields, i int, name string) (bool, string, string) {
+	path1, path2 := createDirectories(i, name)
+	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
-		if !Task5(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
-			return false
+		if !Task5(taskFields.DecimalPlaces, taskFields.Size, taskFields.ExpectedValue, taskFields.StdDeviation, pathResults, pathProfData) {
+			return false, "", ""
 		}
 	}
-	return true
+	return true, path1, path2
 }
 
-func ReturnTask6(taskExtended data.TaskExtended) bool {
-	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
-		os.Mkdir("./Homeworks", 0755)
-	}
-
-	t := time.Now()
-	timeTask := t.Format("(02-Jan-2006_15:04:05)")
-	pathHomework := "./Homeworks/Homework-6_" + timeTask
-	os.Mkdir(pathHomework, 0755)
-
-	path1 := "./Homeworks/Homework-6_" + timeTask + "/Tasks"
-	path2 := "./Homeworks/Homework-6_" + timeTask + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
-
+func ReturnTask6(taskExtended data.TaskFields, i int, name string) (bool, string, string) {
+	path1, path2 := createDirectories(i, name)
 	for i := 0; i < taskExtended.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
 		pathProfData := path2 + "/Answer-" + number + ".xlsx"
 		if !Task6(taskExtended.DecimalPlaces, taskExtended.Size, taskExtended.Size2,
 			taskExtended.Size3, taskExtended.ExpectedValue, taskExtended.StdDeviation, pathResults, pathProfData) {
-			return false
+			return false, "", ""
 		}
 	}
-	return true
+	return true, path1, path2
 }
