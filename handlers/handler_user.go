@@ -1,27 +1,37 @@
 package handlers
 
 import (
-	"MSA/auth"
 	"MSA/data"
 	"MSA/json_responses"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func Registration(w http.ResponseWriter, r *http.Request) {
+	log.Println("Processing in Registration handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	var registrationBody data.RegistrationBody
+	json.Unmarshal(bodyBytes, &registrationBody)
+
 	if err := r.ParseForm(); err != nil {
 		log.Fatalln("ParseForm() err:", err)
 		return
 	}
 
-	email := r.FormValue("email")
-	firstName := r.FormValue("firstname")
-	lastName := r.FormValue("lastname")
-	patronymic := r.FormValue("patronymic")
+	newUser := data.User{Email: registrationBody.Email, FirstName: registrationBody.FirstName,
+		LastName: registrationBody.LastName, Patronymic: registrationBody.Patronymic}
 
-	newUser := data.User{Email: email, FirstName: firstName, LastName: lastName, Patronymic: patronymic}
-
-	isAllCorrect, err := data.IsExist(email)
+	isAllCorrect, err := data.IsExist(registrationBody.Email)
 	if err != nil {
 		log.Println(err)
 		return
@@ -49,16 +59,21 @@ func Registration(w http.ResponseWriter, r *http.Request) {
 }
 
 func PerformLogin(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+	log.Println("Processing in PerformLogin handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	email := r.FormValue("email")
-	password := r.FormValue("password")
-	token := auth.GenerateSessionToken()
+	var authBody data.AuthBody
+	json.Unmarshal(bodyBytes, &authBody)
 
-	if data.IsUserValid(email, password) {
-		user, err := data.GetUserByEmail(email)
+	token := data.GenerateSessionToken()
+
+	if data.IsUserValid(authBody.Email, authBody.Password) {
+		user, err := data.GetUserByEmail(authBody.Email)
 		if err != nil {
 			response, _ := json_responses.ReturnAuthResponse(false, token)
 			w.Write(response)
@@ -73,13 +88,18 @@ func PerformLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func ResetPasswordToken(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+	log.Println("Processing in ResetPasswordToken handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	token := r.FormValue("token")
+	var changePasswordBody data.ChangePasswordBody
+	json.Unmarshal(bodyBytes, &changePasswordBody)
 
-	email, _ := data.GetEmailByToken(token)
+	email, _ := data.GetEmailByToken(changePasswordBody.Token)
 
 	isExist, err := data.IsExist(email)
 	if err != nil {
@@ -87,10 +107,9 @@ func ResetPasswordToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !isExist {
-		newPassword := data.GenerateNewPassword()
-		resp := data.UpdatePassword(email, data.Encrypt(newPassword))
+		resp := data.UpdatePassword(email, data.Encrypt(changePasswordBody.Password))
 		if resp {
-			response, _ := json_responses.ReturnStatus(data.ResetPasswordEmail(email, newPassword))
+			response, _ := json_responses.ReturnStatus(true)
 			w.Write(response)
 		} else {
 			response, _ := json_responses.ReturnStatus(false)
@@ -103,23 +122,27 @@ func ResetPasswordToken(w http.ResponseWriter, r *http.Request) {
 }
 
 func ResetPasswordEmail(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+	log.Println("Processing in ResetPasswordEmail handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	email := r.FormValue("email")
-	email = "chyps97@gmail.com"
+	var emailBody data.EmailBody
+	json.Unmarshal(bodyBytes, &emailBody)
 
-	isExist, err := data.IsExist(email)
+	isExist, err := data.IsExist(emailBody.Email)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	if !isExist {
 		newPassword := data.GenerateNewPassword()
-		resp := data.UpdatePassword(email, data.Encrypt(newPassword))
+		resp := data.UpdatePassword(emailBody.Email, data.Encrypt(newPassword))
 		if resp {
-			response, _ := json_responses.ReturnStatus(data.ResetPasswordEmail(email, newPassword))
+			response, _ := json_responses.ReturnStatus(data.ResetPasswordEmail(emailBody.Email, newPassword))
 			w.Write(response)
 		} else {
 			response, _ := json_responses.ReturnStatus(false)
@@ -133,22 +156,38 @@ func ResetPasswordEmail(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckSession(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+	log.Println("Processing in CheckSession handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	token := r.FormValue("token")
 
-	log.Println("In checkSession method. Token is: ", token)
+	var tokenBody data.TokenBody
+	json.Unmarshal(bodyBytes, &tokenBody)
 
-	exist, err := data.IsTokenExist(token)
+	exist, err := data.IsTokenExist(tokenBody.Token)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
+	email, err := data.GetEmailByToken(tokenBody.Token)
+	if err != nil {
+		log.Println("Невозможно получить email по токену")
+	}
+
+	user, err := data.GetUserByEmail(email)
+	if err != nil {
+		log.Println("Невозможно получить пользователя по email")
+	}
+
 	if exist {
 		log.Println("User authorized!")
-		response, _ := json_responses.ReturnStatus(true)
+		response, _ := json_responses.ReturnFio(strings.Title(user.LastName) + " " +
+			string([]rune(user.FirstName)[0]) + "." + string([]rune(user.Patronymic)[0]) + ".")
 		w.Write(response)
 	} else {
 		log.Println("User unauthorized!")

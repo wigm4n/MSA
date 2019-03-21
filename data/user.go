@@ -13,6 +13,28 @@ type User struct {
 	Password   string `json:"password"`
 }
 
+type AuthBody struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type ChangePasswordBody struct {
+	Token    string `json:"token"`
+	Password string `json:"password"`
+}
+
+type RegistrationBody struct {
+	Email      string `json:"email"`
+	FirstName  string `json:"firstname"`
+	LastName   string `json:"lastname"`
+	Patronymic string `json:"patronymic"`
+}
+
+type FioResponse struct {
+	Fio    string `json:"fio"`
+	Status string `json:"status"`
+}
+
 //регистрация нового пользователя
 func (user *User) RegisterNewUser() (err error) {
 	statement := "INSERT INTO users (email, firstName, lastName, patronymic, password) VALUES ($1, $2, $3, $4, $5) RETURNING id"
@@ -53,9 +75,8 @@ func IsUserValid(email string, password string) (exists bool) {
 
 //получение пользователя по email
 func GetUserByEmail(email string) (user User, err error) {
-	log.Println("in GetUserByEmail method")
-	err = db.QueryRow("SELECT id, email, firstname, lastname, password FROM users WHERE email = $1", email).
-		Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.Password)
+	err = db.QueryRow("SELECT id, email, firstname, lastname, patronymic, password FROM users WHERE email = $1", email).
+		Scan(&user.ID, &user.Email, &user.FirstName, &user.LastName, &user.Patronymic, &user.Password)
 	if err != nil {
 		log.Println("in GetUserByEmail exception:", err)
 		return

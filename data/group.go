@@ -11,6 +11,25 @@ type Group struct {
 	Name          string `json:"name"`
 }
 
+type GroupAddBody struct {
+	Token     string `json:"token"`
+	GroupName string `json:"group_name"`
+}
+
+type GroupIdBody struct {
+	Id int `json:"id"`
+}
+
+type GroupTokenProfBody struct {
+	Id    int    `json:"id"`
+	Token string `json:"token"`
+}
+
+type GroupIdResponse struct {
+	Id     int    `json:"id"`
+	Status string `json:"status"`
+}
+
 //получение имени группы по email
 func GetGroupNameByGroupId(id int) (name string, err error) {
 	err = db.QueryRow("SELECT name FROM groups WHERE id = $1", id).
@@ -24,6 +43,23 @@ func GetGroupNameByGroupId(id int) (name string, err error) {
 
 func GetGroupsByUserId(userId int) (groups []Group, err error) {
 	rows, err := db.Query("SELECT id, name FROM groups WHERE creator_user_id = $1", userId)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for rows.Next() {
+		var group Group
+		err = rows.Scan(&group.ID, &group.Name)
+		if err != nil {
+			log.Println("GetGroupsByUserId exception, err:", err)
+		}
+		groups = append(groups, group)
+	}
+	return
+}
+
+func GetAllGroups() (groups []Group, err error) {
+	rows, err := db.Query("SELECT id, name FROM groups")
 	if err != nil {
 		fmt.Println(err)
 		return

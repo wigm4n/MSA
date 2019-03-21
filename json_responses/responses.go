@@ -119,3 +119,37 @@ func ReturnGroups(groups []data.Group) (response []byte, err error) {
 		return json.Marshal(responseStatus)
 	}
 }
+
+func ReturnId(id int) (response []byte, err error) {
+	var group data.GroupIdResponse
+	group.Id = id
+	group.Status = "success"
+	return json.Marshal(group)
+}
+
+func ReturnDeleteGroupUnavailable() (response []byte, err error) {
+	var responseStatus ResponseStatus
+	responseStatus.Status = "unavailable"
+	log.Println("Json:", responseStatus)
+	return json.Marshal(responseStatus)
+}
+
+func MessageId(id int) (response []byte, err error) {
+	var message data.MessageResponse
+	message.Id = id
+	message.Status = "success"
+	return json.Marshal(message)
+}
+
+func ReturnFio(fio string) (response []byte, err error) {
+	var fioResponse data.FioResponse
+	fioResponse.Fio = fio
+	fioResponse.Status = "success"
+	return json.Marshal(fioResponse)
+}
+
+func ReturnOptions(options []data.OptionNumber) (response []byte, err error) {
+	var optionNubmerBody data.OptionNumberBody
+	optionNubmerBody.Options = options
+	return json.Marshal(optionNubmerBody)
+}
