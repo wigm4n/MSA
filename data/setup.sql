@@ -25,12 +25,14 @@ create table tasks (
   name              varchar(255),
   group_id          integer references groups(id),
   option_count      int,
+  path_to_archive   text,
+  path_to_tasks     text,
   date              timestamp
 );
 
 create table messages (
   id                serial not null primary key,
-  task_id          integer references tasks(id),
+  task_id           integer references tasks(id),
   user_id           varchar(255),
   text              text,
   date              timestamp
@@ -44,9 +46,9 @@ create table sessions (
 
 insert into users (email, firstname, lastname, patronymic, password) values ('test', 'Александр', 'Крупняк', 'asd', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
 insert into users (email, firstname, lastname, patronymic, password) values ('chyps97@gmail.com', 'Александр', 'Крупняк', 'sad', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');
-insert into groups (creator_user_id, name) values (1, 'БПИ151');
-insert into groups (creator_user_id, name) values (1, 'БПИ152');
-insert into groups (creator_user_id, name) values (1, 'БПИ153');
+insert into groups (creator_user_id, name) values (1, 'БПИ151_БД');
+insert into groups (creator_user_id, name) values (1, 'БПИ152_БД');
+insert into groups (creator_user_id, name) values (1, 'БПИ153_БД');
 
 
 insert into users (email, firstname, lastname, password) values ('test3@hse.ru', 'prep', 'prepov', '7110eda4d09e062aa5e4a390b0a572ac0d2c0220');

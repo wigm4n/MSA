@@ -3,19 +3,26 @@ package handlers
 import (
 	"MSA/data"
 	"MSA/json_responses"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 func GetGroups(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+	log.Println("Processing in GetGroups handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	token := r.FormValue("token")
 
-	email, err := data.GetEmailByToken(token)
+	var tokenBody data.TokenBody
+	json.Unmarshal(bodyBytes, &tokenBody)
+
+	email, err := data.GetEmailByToken(tokenBody.Token)
 	if err != nil {
 		log.Println("Невозможно получить email по токену:", err)
 		return
@@ -40,15 +47,37 @@ func GetGroups(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetAllGroups(w http.ResponseWriter, r *http.Request) {
+	log.Println("Processing in GetAllGroups handler")
+
+	groups, err := data.GetAllGroups()
+	if err != nil {
+		log.Println(err, "Ошибка в получении всех групп")
+	}
+
+	if !(groups == nil) {
+		response, _ := json_responses.ReturnGroups(groups)
+		w.Write(response)
+	} else {
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
+	}
+}
+
 func AddGroup(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+	log.Println("Processing in GetGroups handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	token := r.FormValue("token")
-	groupName := r.FormValue("group_name")
 
-	email, err := data.GetEmailByToken(token)
+	var groupAddBody data.GroupAddBody
+	json.Unmarshal(bodyBytes, &groupAddBody)
+
+	email, err := data.GetEmailByToken(groupAddBody.Token)
 	if err != nil {
 		log.Println("Невозможно получить email по токену:", err)
 		return
@@ -59,9 +88,9 @@ func AddGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newGroup := data.Group{CreatorUserId: user.ID, Name: groupName}
+	newGroup := data.Group{CreatorUserId: user.ID, Name: groupAddBody.GroupName}
 	if err := newGroup.CreateNewGroup(); err == nil {
-		response, _ := json_responses.ReturnStatus(true)
+		response, _ := json_responses.ReturnId(newGroup.ID)
 		w.Write(response)
 	} else {
 		log.Println("Невозможно создать новую группу:", err)
@@ -71,18 +100,35 @@ func AddGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteGroup(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+	log.Println("Processing in GetGroups handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	id, _ := strconv.Atoi(r.FormValue("id"))
 
-	if err := data.DeleteGroupById(id); err == nil {
-		response, _ := json_responses.ReturnStatus(true)
-		w.Write(response)
+	var groupIdBody data.GroupIdBody
+	json.Unmarshal(bodyBytes, &groupIdBody)
+
+	isExist, err := data.IsTaskExistByGroupId(groupIdBody.Id)
+	if err != nil {
+		log.Println("Невозможно проверить наличие задания, привязанного к id группы:", err)
+		return
+	}
+	if isExist {
+		if err := data.DeleteGroupById(groupIdBody.Id); err == nil {
+			response, _ := json_responses.ReturnStatus(true)
+			w.Write(response)
+		} else {
+			log.Println("Невозможно удалить группу по id:", err)
+			response, _ := json_responses.ReturnStatus(false)
+			w.Write(response)
+		}
 	} else {
-		log.Println("Невозможно удалить группу по id:", err)
-		response, _ := json_responses.ReturnStatus(false)
+		response, _ := json_responses.ReturnDeleteGroupUnavailable()
+		log.Println("Невозможно удалить группу по id, потому что к группе привязано задание:", err)
 		w.Write(response)
 	}
 }
