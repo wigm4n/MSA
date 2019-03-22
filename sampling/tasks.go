@@ -16,8 +16,7 @@ func Task1(decimalPlaces, n int, expectedValue, stdDeviation float64, pathResult
 	m := Average(seq)
 	Sigma := Variance(seq)
 	TStatisticVal := TStatistic(seq, float64(cnst))
-	tcrit1 := GetStudent(1-alpha, n)
-	tcrit2 := GetStudent(1-alpha/2, n) // Аккуратнее смотреть какую альфу передаём
+	tcrit1, tcrit2 := GetStudent(alpha, n-1)
 
 	// Для студента
 	fileSt := xlsx.NewFile()
@@ -92,7 +91,7 @@ func Task2(decimalPlaces, n int, expectedValue, stdDeviation float64, pathResult
 	seq := GenerateSeq(expectedValue, stdDeviation, decimalPlaces, n)
 	m := Average(seq)
 	Sigma := Variance(seq)
-	tcrit := GetStudent(1-alpha/2, n)
+	_, tcrit := GetStudent(alpha, n-1)
 	tcrit1 := tcrit
 	leftBoard := LeftTboard(seq, tcrit)
 	rightBoard := RightTboard(seq, tcrit)
@@ -166,8 +165,7 @@ func Task3(decimalPlaces, n int, expectedValue, stdDeviation float64, pathResult
 	Sigma1 := Round(math.Sqrt(Variance(seq1))*MAGIC_COEF, 2)
 	Sigma2 := Round(math.Sqrt(Variance(seq2))*MAGIC_COEF, 2)
 	ZStatisticVal := ZStatistic(seq1, seq2)
-	ucrit1 := GetNorm(1 - alpha)
-	ucrit2 := GetNorm(1-alpha) / 2
+	ucrit1, ucrit2 := GetNorm(alpha)
 
 	// Для студента
 	fileSt := xlsx.NewFile()
@@ -245,8 +243,7 @@ func Task4(pathResults, pathProfData string) bool {
 	p1 := Round(float64(m1)/float64(n1), 2)
 	p2 := Round(float64(m2)/float64(n2), 2)
 	ZStatisticVal := ZStatistic2(n1, n2, m1, m2, p1, p2)
-	ucrit1 := GetNorm(1 - alpha)
-	ucrit2 := GetNorm(1 - alpha/2)
+	ucrit1, ucrit2 := GetNorm(alpha)
 
 	// Для студента
 	fileSt := xlsx.NewFile()
@@ -314,7 +311,8 @@ func Task4(pathResults, pathProfData string) bool {
 }
 
 func Task5(decimalPlaces, n int, expectedValue, stdDeviation float64, pathResults, pathProfData string) bool {
-	alpha := ReturnAlpha()
+	//alpha := ReturnAlpha()
+	alpha := 0.05
 	seq1 := GenerateSeq(expectedValue, stdDeviation, decimalPlaces, n)
 	seq2 := GenerateSeq(expectedValue, stdDeviation, decimalPlaces, n)
 	Sigma1 := Variance(seq1)
@@ -328,14 +326,7 @@ func Task5(decimalPlaces, n int, expectedValue, stdDeviation float64, pathResult
 	}
 
 	F := Round(f, 2)
-	fcrit1left := GetFisherLeft(alpha, n)
-	fcrit1right := GetFisherRight(alpha/2, n)
-	fcrit2left := GetFisherLeft(alpha/2, n)
-	fcrit2right := GetFisherRight(alpha/2, n)
-	fcrit3left := GetFisherLeft(1-alpha, n)
-	fcrit3right := GetFisherRight(1-alpha, n)
-	fcrit4left := GetFisherLeft(1-alpha/2, n)
-	fcrit4right := GetFisherRight(1-alpha/2, n)
+	fcrit1 := GetFisher(alpha, n, n)
 
 	// Для студента
 	fileSt := xlsx.NewFile()
@@ -378,21 +369,11 @@ func Task5(decimalPlaces, n int, expectedValue, stdDeviation float64, pathResult
 	sheet2.SetColWidth(0, 0, 35)
 
 	header := []string{"Выборочная дисперсия первой подвыборки", "Выборочная дисперсия второй подвыборки",
-		"F статистика", "левое f критическое порядка a", "правое f критическое порядка a",
-		"левое f критическое порядка a/2", "правое f критическое порядка a/2",
-		"левое f критическое порядка 1-a", "правое f критическое порядка 1-a",
-		"левое f критическое порядка 1-a/2", "правое f критическое порядка 1-a/2", "Альфа"}
+		"F статистика", "f критическое", "Альфа"}
 	result := []string{strconv.FormatFloat(Sigma1, 'f', -2, 64),
 		strconv.FormatFloat(Sigma2, 'f', -2, 64),
 		strconv.FormatFloat(F, 'f', -2, 64),
-		strconv.FormatFloat(fcrit1left, 'f', -2, 64),
-		strconv.FormatFloat(fcrit1right, 'f', -2, 64),
-		strconv.FormatFloat(fcrit2left, 'f', -2, 64),
-		strconv.FormatFloat(fcrit2right, 'f', -2, 64),
-		strconv.FormatFloat(fcrit3left, 'f', -2, 64),
-		strconv.FormatFloat(fcrit3right, 'f', -2, 64),
-		strconv.FormatFloat(fcrit4left, 'f', -2, 64),
-		strconv.FormatFloat(fcrit4right, 'f', -2, 64),
+		strconv.FormatFloat(fcrit1, 'f', -2, 64),
 		strconv.FormatFloat(alpha, 'f', -2, 64)}
 	for h := range header {
 		rowPr1 := sheet2.AddRow()
@@ -411,7 +392,8 @@ func Task5(decimalPlaces, n int, expectedValue, stdDeviation float64, pathResult
 }
 
 func Task6(decimalPlaces, n1, n2, n3 int, expectedValue, stdDeviation float64, pathResults, pathProfData string) bool {
-	alpha := ReturnAlpha()
+	//alpha := ReturnAlpha()
+	alpha := 0.05
 	var seq1, seq2, seq3 []float64
 	var stopCounter = 0
 	var quit = false
@@ -431,8 +413,7 @@ func Task6(decimalPlaces, n1, n2, n3 int, expectedValue, stdDeviation float64, p
 	Q1 := Q1(seq1, seq2, seq3)
 	Q2 := Q2(seq1, seq2, seq3)
 	F := F(seq1, seq2, seq3)
-	fcrit1left := GetFisherLeft(alpha, (n1+n2+n3-3)/3)
-	fcrit1right := GetFisherRight(alpha, (n1+n2+n3-3)/3)
+	fcrit1 := GetFisher(alpha, 2, (n1+n2+n3-3)/3)
 
 	// Для студента
 	fileSt := xlsx.NewFile()
@@ -494,7 +475,7 @@ func Task6(decimalPlaces, n1, n2, n3 int, expectedValue, stdDeviation float64, p
 
 	header := []string{"Выборочное среднее первой подвыборки", "Выборочное среднее второй подвыборки",
 		"Выборочное среднее третьей подвыборки", "Среднее всей выборки", "TSS", "Межгрупповой размах", "Внутригрупповой размах",
-		"F статистика", "левое f критическое", "правое f критическое", "Альфа"}
+		"F статистика", "f критическое", "Альфа"}
 	result := []string{strconv.FormatFloat(X1, 'f', -2, 64),
 		strconv.FormatFloat(X2, 'f', -2, 64),
 		strconv.FormatFloat(X3, 'f', -2, 64),
@@ -503,8 +484,7 @@ func Task6(decimalPlaces, n1, n2, n3 int, expectedValue, stdDeviation float64, p
 		strconv.FormatFloat(Q1, 'f', -2, 64),
 		strconv.FormatFloat(Q2, 'f', -2, 64),
 		strconv.FormatFloat(F, 'f', -2, 64),
-		strconv.FormatFloat(fcrit1left, 'f', -2, 64),
-		strconv.FormatFloat(fcrit1right, 'f', -2, 64),
+		strconv.FormatFloat(fcrit1, 'f', -2, 64),
 		strconv.FormatFloat(alpha, 'f', -2, 64)}
 	for h := range header {
 		rowPr1 := sheet2.AddRow()

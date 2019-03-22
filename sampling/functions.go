@@ -28,7 +28,7 @@ func GetRand(min, max int) int {
 }
 
 func ReturnAlpha() float64 {
-	alpha := []float64{0.05, 0.02, 0.01, 0.1}
+	alpha := []float64{0.05, 0.01, 0.1}
 	x := GetRand(0, len(alpha)-1)
 	return alpha[x]
 }
