@@ -46,6 +46,23 @@ func GetForums(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func GetAllForums(w http.ResponseWriter, r *http.Request) {
+	log.Println("Processing in GetAllForums handler")
+
+	forums, err := data.GetAllForums()
+	if err != nil {
+		log.Println(err, "Ошибка в получении всех групп")
+	}
+
+	if !(forums == nil) {
+		response, _ := json_responses.ReturnForums(forums)
+		w.Write(response)
+	} else {
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
+	}
+}
+
 func GetForum(w http.ResponseWriter, r *http.Request) {
 	log.Println("Processing in GetForum handler")
 

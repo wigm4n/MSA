@@ -131,3 +131,20 @@ func GetMessagesByForum(forumId int) (messages []Message, err error) {
 	}
 	return
 }
+
+func GetAllForums() (forums []Forum, err error) {
+	rows, err := db.Query("SELECT id, name, date FROM tasks")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for rows.Next() {
+		var forum Forum
+		err = rows.Scan(&forum.ID, &forum.Name, &forum.Date)
+		if err != nil {
+			log.Println("GetGroupsByUserId exception, err:", err)
+		}
+		forums = append(forums, forum)
+	}
+	return
+}

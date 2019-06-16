@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -248,12 +249,15 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	taskExtended.TaskType = taskFront.TaskType
 	taskExtended.Token = taskFront.Token
 
+	//email := "hshsd"
 	email, err := data.GetEmailByToken(taskExtended.Token)
 	if err != nil {
 		log.Println(err, "Ошибка в получении email по токену")
 	}
 	taskExtended.Email = email
 
+	//user := data.User{ID:2, Email:"test@mail.com", FirstName:"name", LastName:"lastname", Patronymic:"last2name",
+	//Password:"1234"}
 	user, err := data.GetUserByEmail(taskExtended.Email)
 	if err != nil {
 		log.Println(err, "Ошибка в получении пользователя из базы данных")
@@ -265,6 +269,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err, "Ошибка в получении имени группы по id", err)
 		}
+		//groupName := "group151"
 		var pathToArchive, pathToTasks string
 		status, pathToArchive, pathToTasks = TaskType(taskExtended.TaskType).TaskType(taskExtended.TaskFieldsList[i],
 			i, groupName)
@@ -281,11 +286,16 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		err = taskForDB.CreateNewTaskInDB(user.ID)
 		if err != nil {
 			log.Println(err, "Ошибка в создании задания в базе данных")
+			status = false
 		}
-		data.CreateWelcomeMessage(taskForDB.ID, taskExtended.Email, taskExtended.Name)
+		user, _ := data.GetUserByEmail(taskExtended.Email)
+		data.CreateWelcomeMessage(taskForDB.ID, strings.Title(user.LastName)+" "+
+			string([]rune(user.FirstName)[0])+"."+string([]rune(user.Patronymic)[0])+".", taskExtended.Name)
 		if err != nil {
 			log.Println(err, "Ошибка в создании первого собщения в базе данных")
+			status = false
 		}
+		log.Println(taskForDB.Count)
 	}
 
 	response, err := json_responses.ReturnStatus(status)

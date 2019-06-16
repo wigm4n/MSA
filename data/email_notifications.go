@@ -60,7 +60,7 @@ func CreateNewUserEmail(user User) (exists bool) {
 	d := gomail.NewDialer("smtp.gmail.com", 587, credentials.Email, credentials.Password)
 
 	if err := d.DialAndSend(m); err != nil {
-		panic(err)
+		log.Println(err)
 		return false
 	}
 	return true
