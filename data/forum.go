@@ -7,7 +7,8 @@ import (
 )
 
 type Message struct {
-	TaskId   int    `json:"id"`
+	Id       int    `json:"id"`
+	TaskId   int    `json:"task_id"`
 	UserName string `json:"username"`
 	Text     string `json:"text"`
 }
@@ -16,15 +17,52 @@ type Forums struct {
 	Forums []Task `json:"tasks"`
 }
 
+type ForumIdBody struct {
+	Id int `json:"id"`
+}
+
+type MessageResponse struct {
+	Id     int    `json:"id"`
+	Status string `json:"status"`
+}
+
 func (message *Message) CreateNewMessage() (err error) {
-	statement := "INSERT INTO messages (task_id, user_id, text, date) VALUES ($1, $2, $3, $4)"
+	statement := "INSERT INTO messages (task_id, user_id, text, date) VALUES ($1, $2, $3, $4) returning id"
 	stmt, err := db.Prepare(statement)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer stmt.Close()
-	stmt.Query(message.TaskId, message.UserName, message.Text, time.Now())
+	err = stmt.QueryRow(message.TaskId, message.UserName, message.Text, time.Now()).Scan(&message.Id)
+	return
+}
+
+func DeleteMessage(id int) (err error) {
+	statement := "DELETE FROM messages WHERE id = $1"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	return
+}
+
+func DeleteAllMessagesByTaskId(id int) (err error) {
+	statement := "DELETE FROM messages WHERE task_id = $1"
+	stmt, err := db.Prepare(statement)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
 	return
 }
 
@@ -90,6 +128,23 @@ func GetMessagesByForum(forumId int) (messages []Message, err error) {
 	if err != nil {
 		log.Println("GetMessagesByForum exception, err:", err)
 		return
+	}
+	return
+}
+
+func GetAllForums() (forums []Forum, err error) {
+	rows, err := db.Query("SELECT id, name, date FROM tasks")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for rows.Next() {
+		var forum Forum
+		err = rows.Scan(&forum.ID, &forum.Name, &forum.Date)
+		if err != nil {
+			log.Println("GetGroupsByUserId exception, err:", err)
+		}
+		forums = append(forums, forum)
 	}
 	return
 }

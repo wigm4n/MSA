@@ -4,10 +4,14 @@ import (
 	"MSA/data"
 	"MSA/json_responses"
 	"MSA/sampling"
+	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type TaskType int
@@ -22,18 +26,22 @@ const (
 )
 
 func GetTasksByProfessor(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+	log.Println("Processing in GetTasksByProfessor handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	log.Println("Process is in GetTasksByProf method")
-	token := r.FormValue("token")
-	email, err := data.GetEmailByToken(token)
+
+	var tokenBody data.TokenBody
+	json.Unmarshal(bodyBytes, &tokenBody)
+
+	email, err := data.GetEmailByToken(tokenBody.Token)
 	if err != nil {
 		log.Println(err, "Ошибка в email по токену")
 	}
-
-	email = "test"
 
 	user, err := data.GetUserByEmail(email)
 	if err != nil {
@@ -55,19 +63,19 @@ func GetTasksByProfessor(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetTasksForStudents(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+	log.Println("Processing in GetTasksForStudents handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	log.Println("Process is in GetTasksForStudents method")
 
-	groupId, _ := strconv.Atoi(r.FormValue("group_id"))
-	optionNumber := r.FormValue("option_number")
-	log.Println(optionNumber)
+	var tasksStudentsBody data.TasksStudentsBody
+	json.Unmarshal(bodyBytes, &tasksStudentsBody)
 
-	groupId = 1
-
-	tasks, err := data.GetForumsByGroup(groupId)
+	tasks, err := data.GetForumsByGroup(tasksStudentsBody.GroupId)
 	if err != nil {
 		log.Println(err, "Ошибка в получении заданий для пользователя ")
 	}
@@ -81,53 +89,175 @@ func GetTasksForStudents(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CreateTask(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		log.Fatalln("ParseForm() err:", err)
+func GetOptionNumberForTask(w http.ResponseWriter, r *http.Request) {
+	log.Println("Processing in GetTasksForStudents handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
 		return
 	}
-	log.Println("Process is in CreateTask method")
 
+	var tasksStudentsBody data.TaskIdBody
+	json.Unmarshal(bodyBytes, &tasksStudentsBody)
+
+	optionCount, err := data.GetOptionCountByTaskId(tasksStudentsBody.TaskId)
+	if err != nil {
+		log.Println(err, "Ошибка в получении заданий для пользователя ")
+	}
+
+	if optionCount > 0 {
+		var options []data.OptionNumber
+		for i := 0; i < optionCount; i++ {
+			var option data.OptionNumber
+			option.Id = i + 1
+			option.Name = "Вариант №" + strconv.Itoa(i+1)
+			options = append(options, option)
+		}
+		response, _ := json_responses.ReturnOptions(options)
+		w.Write(response)
+	} else {
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
+	}
+}
+
+func DownloadTaskForProf(w http.ResponseWriter, r *http.Request) {
+	log.Println("Processing in DownloadTaskForProf handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	var taskIdBody data.GroupTokenProfBody
+	json.Unmarshal(bodyBytes, &taskIdBody)
+
+	//MOCK
+	//taskIdBody.Id = 6
+	//taskIdBody.Token = "XTPSAIOLSTFOPOPM"
+
+	isExist, _ := data.IsTokenExist(taskIdBody.Token)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	if isExist {
+		path, err := data.GetProfPathByTaskId(taskIdBody.Id)
+		if err != nil {
+			log.Println(err, "Ошибка в получении пути для задания")
+		}
+
+		dataq, err := ioutil.ReadFile(path)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+		w.Header().Set("Content-Length", r.Header.Get("Content-Length"))
+		w.Header().Set("Content-Disposition", "attachment; filename=Архив с заданиями.zip")
+
+		http.ServeContent(w, r, "Архив с заданиями.zip", time.Now(), bytes.NewReader(dataq))
+	} else {
+		log.Println("Невозможно скачать задание с указанным токеном")
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
+	}
+}
+
+func DownloadTaskForStudent(w http.ResponseWriter, r *http.Request) {
+	log.Println("Processing in DownloadTaskForStudent handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	var downloadTask data.DownloadTaskStudent
+	json.Unmarshal(bodyBytes, &downloadTask)
+
+	//MOCK
+	//downloadTask.Id = 3
+	//downloadTask.OptionNumber = 4
+
+	path, err := data.GetTasksPathByTaskId(downloadTask.Id)
+	if err != nil {
+		log.Println(err, "Ошибка в получении пути для задания")
+	}
+
+	dataq, err := ioutil.ReadFile(path + "/Task-" + strconv.Itoa(downloadTask.OptionNumber) + ".xlsx")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+	w.Header().Set("Content-Length", r.Header.Get("Content-Length"))
+	w.Header().Set("Content-Disposition", "attachment; filename=Вариант"+strconv.Itoa(downloadTask.OptionNumber)+".xlsx")
+
+	http.ServeContent(w, r, "Вариант"+strconv.Itoa(downloadTask.OptionNumber)+".xlsx", time.Now(), bytes.NewReader(dataq))
+}
+
+func DeleteTask(w http.ResponseWriter, r *http.Request) {
+	log.Println("Processing in DeleteTask handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	var taskIdBody data.GroupIdBody
+	json.Unmarshal(bodyBytes, &taskIdBody)
+
+	err = data.DeleteAllMessagesByTaskId(taskIdBody.Id)
+	if err != nil {
+		log.Println(err, "Ошибка в удалении форума по id задания")
+	}
+
+	if err := data.DeleteTaskById(taskIdBody.Id); err == nil {
+		response, _ := json_responses.ReturnStatus(true)
+		w.Write(response)
+	} else {
+		log.Println("Невозможно удалить задание по id:", err)
+		response, _ := json_responses.ReturnStatus(false)
+		w.Write(response)
+	}
+}
+
+func CreateTask(w http.ResponseWriter, r *http.Request) {
+	log.Println("Processing in CreateTask handler")
+
+	bodyBytes, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	var taskFront data.TaskFront
+	json.Unmarshal(bodyBytes, &taskFront)
 	var taskExtended data.TaskExtended
+	taskExtended.TaskFieldsList = taskFront.TaskFieldsList
+	taskExtended.Name = taskFront.Name
+	taskExtended.TaskType = taskFront.TaskType
+	taskExtended.Token = taskFront.Token
 
-	taskExtended.Name = r.FormValue("task_name")
-	taskExtended.TaskType, _ = strconv.Atoi(r.FormValue("task_type"))
-	taskExtended.Token = r.FormValue("token")
-
-	mockString := "[{" +
-		"\"group_id\": 1," +
-		"\"count\": 10," +
-		"\"size\": 15," +
-		"\"size_2\": 15," +
-		"\"size_3\": 15," +
-		"\"expected_value\": -7.8," +
-		"\"std_deviation\": 20," +
-		"\"decimal_places\": 2},{" +
-		"\"group_id\": 2," +
-		"\"count\": 10," +
-		"\"size\": 8," +
-		"\"size_2\": 8," +
-		"\"size_3\": 8," +
-		"\"expected_value\": 80," +
-		"\"std_deviation\": 2.1," +
-		"\"decimal_places\": 4}]"
-	taskExtended.Name = "домашка номер 1"
-	taskExtended.TaskType = 6
-
-	var fields []data.TaskFields
-	//json.Unmarshal([]byte(r.FormValue("task_fields")), &fields)
-	json.Unmarshal([]byte(mockString), &fields)
-	taskExtended.TaskFieldsList = fields
-
+	//email := "hshsd"
 	email, err := data.GetEmailByToken(taskExtended.Token)
 	if err != nil {
 		log.Println(err, "Ошибка в получении email по токену")
 	}
 	taskExtended.Email = email
 
-	log.Println("Read task params from user:", taskExtended)
-
-	//===== запись в базу данных
+	//user := data.User{ID:2, Email:"test@mail.com", FirstName:"name", LastName:"lastname", Patronymic:"last2name",
+	//Password:"1234"}
 	user, err := data.GetUserByEmail(taskExtended.Email)
 	if err != nil {
 		log.Println(err, "Ошибка в получении пользователя из базы данных")
@@ -135,25 +265,14 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	var status bool
 	for i := 0; i < len(taskExtended.TaskFieldsList); i++ {
-		taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskFieldsList[i].GroupId,
-			taskExtended.TaskFieldsList[i].Count)
-		err = taskForDB.CreateNewTaskInDB(user.ID)
-		if err != nil {
-			log.Println(err, "Ошибка в создании задания в базе данных")
-		}
-		data.CreateWelcomeMessage(taskForDB.ID, taskExtended.Email, taskExtended.Name)
-		if err != nil {
-			log.Println(err, "Ошибка в создании первого собщения в базе данных")
-		}
-
-		//ГЕНЕРАЦИЯ ЗАДАНИЙ ВКЛЮЧЕНА
 		groupName, err := data.GetGroupNameByGroupId(taskExtended.TaskFieldsList[i].GroupId)
 		if err != nil {
 			log.Println(err, "Ошибка в получении имени группы по id", err)
 		}
-		status, _, _ = TaskType(taskExtended.TaskType).TaskType(taskExtended.TaskFieldsList[i], i, groupName)
-		//status, path1, path2 :=
-		//TODO: продумать хранение путей к файлам и запись в базу
+		//groupName := "group151"
+		var pathToArchive, pathToTasks string
+		status, pathToArchive, pathToTasks = TaskType(taskExtended.TaskType).TaskType(taskExtended.TaskFieldsList[i],
+			i, groupName)
 		if !status {
 			log.Println("Ошибка в генерации данных")
 			response, _ := json_responses.ReturnStatus(status)
@@ -162,13 +281,24 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println("Task data generated:", status)
 
+		taskForDB := data.CreateNewTaskObject(taskExtended.Name, taskExtended.TaskFieldsList[i].GroupId,
+			taskExtended.TaskFieldsList[i].Count, pathToArchive, pathToTasks)
+		err = taskForDB.CreateNewTaskInDB(user.ID)
+		if err != nil {
+			log.Println(err, "Ошибка в создании задания в базе данных")
+			status = false
+		}
+		user, _ := data.GetUserByEmail(taskExtended.Email)
+		data.CreateWelcomeMessage(taskForDB.ID, strings.Title(user.LastName)+" "+
+			string([]rune(user.FirstName)[0])+"."+string([]rune(user.Patronymic)[0])+".", taskExtended.Name)
+		if err != nil {
+			log.Println(err, "Ошибка в создании первого собщения в базе данных")
+			status = false
+		}
+		log.Println(taskForDB.Count)
 	}
-	//=====
 
 	response, err := json_responses.ReturnStatus(status)
-
-	//ГЕНЕРАЦИЯ ЗАДАНИЙ ВЫКЛЮЧЕНА
-	//response, err := json_responses.ReturnStatus(true)
 
 	if err = r.ParseForm(); err != nil {
 		log.Fatalln("Error in the formation of a response from the server... Error is:", err)

@@ -2,6 +2,7 @@ package sampling
 
 import (
 	"MSA/data"
+	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -27,7 +28,7 @@ func GetRand(min, max int) int {
 }
 
 func ReturnAlpha() float64 {
-	alpha := []float64{0.05, 0.02, 0.01, 0.1}
+	alpha := []float64{0.05, 0.01, 0.1}
 	x := GetRand(0, len(alpha)-1)
 	return alpha[x]
 }
@@ -196,26 +197,28 @@ func Tss(seq1, seq2, seq3 []float64) (q float64) {
 	return Round(q, 2)
 }
 
-func createDirectories(i int, name string) (path1, path2 string) {
+func createDirectories(i int, name string) (pathHomework string) {
 	if _, err := os.Stat("./Homeworks"); os.IsNotExist(err) {
 		os.Mkdir("./Homeworks", 0755)
 	}
 
 	t := time.Now()
 	timeTask := t.Format("_02-Jan-2006-15-04-05_")
-	pathHomework := "./Homeworks/" + name + timeTask + strconv.Itoa(i+1)
+	pathHomework = "./Homeworks/" + name + timeTask + strconv.Itoa(i+1)
 	os.Mkdir(pathHomework, 0755)
 
-	path1 = pathHomework + "/Tasks"
-	path2 = pathHomework + "/Answers"
-	os.Mkdir(path1, 0755)
-	os.Mkdir(path2, 0755)
+	pathHomework1 := pathHomework + "/Data"
+	os.Mkdir(pathHomework1, 0755)
 
-	return path1, path2
+	return pathHomework
 }
 
 func ReturnTask1(taskFields data.TaskFields, i int, name string) (bool, string, string) {
-	path1, path2 := createDirectories(i, name)
+	path := createDirectories(i, name)
+	path1 := path + "/Data/Tasks"
+	path2 := path + "/Data/Answers"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
@@ -224,11 +227,21 @@ func ReturnTask1(taskFields data.TaskFields, i int, name string) (bool, string, 
 			return false, "", ""
 		}
 	}
-	return true, path1, path2
+	err, pathToArchive, pathToTasks := data.MakeArchive(path)
+	if err != nil {
+		log.Println(err, "Невозможно создать архив с данными")
+		return false, "", ""
+	}
+	path = path + ""
+	return true, pathToArchive, pathToTasks
 }
 
 func ReturnTask2(taskFields data.TaskFields, i int, name string) (bool, string, string) {
-	path1, path2 := createDirectories(i, name)
+	path := createDirectories(i, name)
+	path1 := path + "/Data/Tasks"
+	path2 := path + "/Data/Answers"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
@@ -237,11 +250,21 @@ func ReturnTask2(taskFields data.TaskFields, i int, name string) (bool, string, 
 			return false, "", ""
 		}
 	}
-	return true, path1, path2
+	err, pathToArchive, pathToTasks := data.MakeArchive(path)
+	if err != nil {
+		log.Println(err, "Невозможно создать архив с данными")
+		return false, "", ""
+	}
+	path = path + ""
+	return true, pathToArchive, pathToTasks
 }
 
 func ReturnTask3(taskFields data.TaskFields, i int, name string) (bool, string, string) {
-	path1, path2 := createDirectories(i, name)
+	path := createDirectories(i, name)
+	path1 := path + "/Data/Tasks"
+	path2 := path + "/Data/Answers"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
@@ -250,11 +273,21 @@ func ReturnTask3(taskFields data.TaskFields, i int, name string) (bool, string, 
 			return false, "", ""
 		}
 	}
-	return true, path1, path2
+	err, pathToArchive, pathToTasks := data.MakeArchive(path)
+	if err != nil {
+		log.Println(err, "Невозможно создать архив с данными")
+		return false, "", ""
+	}
+	path = path + ""
+	return true, pathToArchive, pathToTasks
 }
 
 func ReturnTask4(taskFields data.TaskFields, i int, name string) (bool, string, string) {
-	path1, path2 := createDirectories(i, name)
+	path := createDirectories(i, name)
+	path1 := path + "/Data/Tasks"
+	path2 := path + "/Data/Answers"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
@@ -263,11 +296,21 @@ func ReturnTask4(taskFields data.TaskFields, i int, name string) (bool, string, 
 			return false, "", ""
 		}
 	}
-	return true, path1, path2
+	err, pathToArchive, pathToTasks := data.MakeArchive(path)
+	if err != nil {
+		log.Println(err, "Невозможно создать архив с данными")
+		return false, "", ""
+	}
+	path = path + ""
+	return true, pathToArchive, pathToTasks
 }
 
 func ReturnTask5(taskFields data.TaskFields, i int, name string) (bool, string, string) {
-	path1, path2 := createDirectories(i, name)
+	path := createDirectories(i, name)
+	path1 := path + "/Data/Tasks"
+	path2 := path + "/Data/Answers"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 	for i := 0; i < taskFields.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
@@ -276,11 +319,21 @@ func ReturnTask5(taskFields data.TaskFields, i int, name string) (bool, string, 
 			return false, "", ""
 		}
 	}
-	return true, path1, path2
+	err, pathToArchive, pathToTasks := data.MakeArchive(path)
+	if err != nil {
+		log.Println(err, "Невозможно создать архив с данными")
+		return false, "", ""
+	}
+	path = path + ""
+	return true, pathToArchive, pathToTasks
 }
 
 func ReturnTask6(taskExtended data.TaskFields, i int, name string) (bool, string, string) {
-	path1, path2 := createDirectories(i, name)
+	path := createDirectories(i, name)
+	path1 := path + "/Data/Tasks"
+	path2 := path + "/Data/Answers"
+	os.Mkdir(path1, 0755)
+	os.Mkdir(path2, 0755)
 	for i := 0; i < taskExtended.Count; i++ {
 		number := strconv.Itoa(i + 1)
 		pathResults := path1 + "/Task-" + number + ".xlsx"
@@ -290,5 +343,11 @@ func ReturnTask6(taskExtended data.TaskFields, i int, name string) (bool, string
 			return false, "", ""
 		}
 	}
-	return true, path1, path2
+	err, pathToArchive, pathToTasks := data.MakeArchive(path)
+	if err != nil {
+		log.Println(err, "Невозможно создать архив с данными")
+		return false, "", ""
+	}
+	path = path + ""
+	return true, pathToArchive, pathToTasks
 }

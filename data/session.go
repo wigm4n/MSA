@@ -8,6 +8,14 @@ type Session struct {
 	Token  string
 }
 
+type TokenBody struct {
+	Token string `json:"token"`
+}
+
+type EmailBody struct {
+	Email string `json:"email"`
+}
+
 func AddNewSession(userId int, token string) (err error) {
 	isExist, err := IsTokenUserWithToken(userId)
 	if err != nil {
